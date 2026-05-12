@@ -30,13 +30,15 @@ body{
     padding:clamp(24px, 8vw, 40px);
 }
 
-h1{
-    font-size:clamp(2.4rem, 12vw, 4rem);
-    line-height:1.05;
-    margin:0 0 10px;
-    letter-spacing:0.04em;
-    overflow-wrap:normal;
-    hyphens:manual;
+.logo-heading{
+    margin:0 0 clamp(28px, 6vw, 48px);
+}
+
+.logo{
+    display:block;
+    width:min(100%, 520px);
+    height:auto;
+    margin:0 auto;
 }
 
 p{
@@ -50,7 +52,9 @@ p{
 
 <body>
 <div class="container">
-    <h1>Gangbang&shy;brudar</h1>
+    <h1 class="logo-heading">
+        <img class="logo" src="assets/images/logo.svg" alt="Gangbangbrudar">
+    </h1>
     <p>Nya föreställningar i september. Mer information kommer snart.</p>
 </div>
 </body>
