@@ -359,6 +359,38 @@ main{
     line-height:1;
 }
 
+.lightbox-nav{
+    position:absolute;
+    top:50%;
+    display:grid;
+    place-items:center;
+    width:44px;
+    height:56px;
+    padding:0;
+    background:rgba(0, 0, 0, .56);
+    border:1px solid rgba(255, 255, 255, .18);
+    color:var(--text);
+    cursor:pointer;
+    font:inherit;
+    font-size:2rem;
+    line-height:1;
+    transform:translateY(-50%);
+}
+
+.lightbox-nav:hover,
+.lightbox-close:hover{
+    background:rgba(0, 0, 0, .78);
+    border-color:rgba(255, 255, 255, .36);
+}
+
+.lightbox-prev{
+    left:10px;
+}
+
+.lightbox-next{
+    right:10px;
+}
+
 .people-list,
 .dates-list{
     display:grid;

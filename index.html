@@ -187,7 +187,9 @@
 <dialog class="lightbox" id="gallery-lightbox" aria-label="Förhandsvisning av bild">
     <div class="lightbox-inner">
         <button class="lightbox-close" type="button" aria-label="Stäng">×</button>
+        <button class="lightbox-nav lightbox-prev" type="button" aria-label="Föregående bild">‹</button>
         <img alt="">
+        <button class="lightbox-nav lightbox-next" type="button" aria-label="Nästa bild">›</button>
     </div>
 </dialog>
 
@@ -197,10 +199,21 @@ const gallery = document.querySelector("#gallery");
 const lightbox = document.querySelector("#gallery-lightbox");
 const lightboxImage = lightbox.querySelector("img");
 const lightboxClose = lightbox.querySelector(".lightbox-close");
+const lightboxPrev = lightbox.querySelector(".lightbox-prev");
+const lightboxNext = lightbox.querySelector(".lightbox-next");
 const menuToggle = document.querySelector(".menu-toggle");
 const mobileMenu = document.querySelector("#mobile-menu");
 const imageBasePath = "assets/images/gallery/";
 const galleryImages = Array.isArray(window.galleryImages) ? window.galleryImages : [];
+let activeGalleryIndex = 0;
+
+function showGalleryImage(index) {
+    activeGalleryIndex = (index + galleryImages.length) % galleryImages.length;
+    const imagePath = imageBasePath + galleryImages[activeGalleryIndex];
+
+    lightboxImage.src = imagePath;
+    lightboxImage.alt = `Bild från Gangbangbrudar ${activeGalleryIndex + 1}`;
+}
 
 menuToggle.addEventListener("click", () => {
     const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
@@ -240,8 +253,7 @@ galleryImages.forEach((fileName, index) => {
 
     button.append(image);
     button.addEventListener("click", () => {
-        lightboxImage.src = imagePath;
-        lightboxImage.alt = image.alt;
+        showGalleryImage(index);
         lightbox.showModal();
     });
 
@@ -252,9 +264,31 @@ lightboxClose.addEventListener("click", () => {
     lightbox.close();
 });
 
+lightboxPrev.addEventListener("click", () => {
+    showGalleryImage(activeGalleryIndex - 1);
+});
+
+lightboxNext.addEventListener("click", () => {
+    showGalleryImage(activeGalleryIndex + 1);
+});
+
 lightbox.addEventListener("click", (event) => {
     if (event.target === lightbox) {
         lightbox.close();
+    }
+});
+
+document.addEventListener("keydown", (event) => {
+    if (!lightbox.open) {
+        return;
+    }
+
+    if (event.key === "ArrowLeft") {
+        showGalleryImage(activeGalleryIndex - 1);
+    }
+
+    if (event.key === "ArrowRight") {
+        showGalleryImage(activeGalleryIndex + 1);
     }
 });
 </script>
