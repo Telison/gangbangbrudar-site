@@ -204,7 +204,7 @@
     <div class="lightbox-inner">
         <button class="lightbox-close" type="button" aria-label="Stäng">×</button>
         <button class="lightbox-nav lightbox-prev" type="button" aria-label="Föregående bild">‹</button>
-        <img alt="">
+        <img alt="" draggable="false">
         <button class="lightbox-nav lightbox-next" type="button" aria-label="Nästa bild">›</button>
     </div>
 </dialog>
@@ -222,6 +222,10 @@ const mobileMenu = document.querySelector("#mobile-menu");
 const imageBasePath = "assets/images/gallery/";
 const galleryImages = Array.isArray(window.galleryImages) ? window.galleryImages : [];
 let activeGalleryIndex = 0;
+let swipeStartX = 0;
+let swipeStartY = 0;
+let swipePointerId = null;
+const minSwipeDistance = 48;
 
 function showGalleryImage(index) {
     activeGalleryIndex = (index + galleryImages.length) % galleryImages.length;
@@ -286,6 +290,37 @@ lightboxPrev.addEventListener("click", () => {
 
 lightboxNext.addEventListener("click", () => {
     showGalleryImage(activeGalleryIndex + 1);
+});
+
+lightboxImage.addEventListener("pointerdown", (event) => {
+    if (!event.isPrimary || galleryImages.length < 2) {
+        return;
+    }
+
+    swipeStartX = event.clientX;
+    swipeStartY = event.clientY;
+    swipePointerId = event.pointerId;
+    lightboxImage.setPointerCapture(swipePointerId);
+});
+
+lightboxImage.addEventListener("pointerup", (event) => {
+    if (event.pointerId !== swipePointerId) {
+        return;
+    }
+
+    const deltaX = event.clientX - swipeStartX;
+    const deltaY = event.clientY - swipeStartY;
+    const isHorizontalSwipe = Math.abs(deltaX) >= minSwipeDistance && Math.abs(deltaX) > Math.abs(deltaY) * 1.2;
+
+    if (isHorizontalSwipe) {
+        showGalleryImage(activeGalleryIndex + (deltaX < 0 ? 1 : -1));
+    }
+
+    swipePointerId = null;
+});
+
+lightboxImage.addEventListener("pointercancel", () => {
+    swipePointerId = null;
 });
 
 lightbox.addEventListener("click", (event) => {

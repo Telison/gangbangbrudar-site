@@ -339,6 +339,8 @@ main{
     height:auto;
     max-height:calc(100svh - 28px);
     object-fit:contain;
+    touch-action:pan-y;
+    user-select:none;
 }
 
 .lightbox-close{

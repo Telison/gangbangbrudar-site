@@ -11,15 +11,12 @@ The site is currently a simple coming-soon page and will grow into the public in
 - Placeholder copy announcing upcoming September shows
 - Contact section with production email address
 - SVG favicon based on the Vixen Produktion mark
+- Swipe gestures for navigating the mobile gallery lightbox
 
 ## Planned Content
 
 - Ticket purchase link
 - Actor portraits
-
-## TODO
-
-- Can we get swipe gestures to work on mobile to navigate between gallery pictures?
 
 ## Design Direction
 
