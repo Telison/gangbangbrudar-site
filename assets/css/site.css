@@ -221,7 +221,7 @@ main{
 }
 
 .trailer-frame{
-    width:min(420px, 100%);
+    width:min(520px, 100%);
     margin:0 auto;
     background:var(--panel);
     border:1px solid rgba(255, 255, 255, .1);
@@ -231,7 +231,7 @@ main{
 .trailer-frame video{
     display:block;
     width:100%;
-    aspect-ratio:9 / 16;
+    aspect-ratio:4 / 5;
     object-fit:cover;
     background:#000;
 }
