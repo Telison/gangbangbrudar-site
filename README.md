@@ -40,7 +40,8 @@ The site should be designed mobile-first, since most visitors are expected to ar
 ├── CNAME
 ├── index.html
 ├── scripts/
-│   └── update-play-images.ps1
+│   ├── optimize-gallery-images.ps1
+│   └── update-gallery-images.ps1
 └── README.md
 ```
 
@@ -52,10 +53,16 @@ Open `index.html` directly in a browser to preview changes locally.
 
 ## Updating Play Images
 
-The gallery is rendered from `assets/images/gallery/images.js`. After adding or removing images in `assets/images/gallery`, regenerate the image manifest:
+The gallery is rendered from optimized WebP images listed in `assets/images/gallery/images.js`. After adding or removing images in `assets/images/gallery`, regenerate the image manifest:
 
 ```powershell
-.\scripts\update-play-images.ps1
+.\scripts\update-gallery-images.ps1
+```
+
+If new source images are added as JPG or PNG files, optimize them to WebP and update the manifest:
+
+```powershell
+.\scripts\optimize-gallery-images.ps1
 ```
 
 The production domain is configured as:

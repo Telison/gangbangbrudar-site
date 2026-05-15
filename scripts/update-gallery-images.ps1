@@ -18,7 +18,7 @@ $files = Get-ChildItem -LiteralPath $imageDir -File |
     }, Name |
     Select-Object -ExpandProperty Name
 
-$lines = @("window.playImages = [")
+$lines = @("window.galleryImages = [")
 
 for ($i = 0; $i -lt $files.Count; $i++) {
     $escapedName = $files[$i].Replace("\", "\\").Replace('"', '\"')

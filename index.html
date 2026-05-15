@@ -69,7 +69,7 @@
         <div class="section-inner">
             <p class="eyebrow">Bilder</p>
             <h2 class="section-title" id="gallery-title">Galleri.</h2>
-            <div class="gallery-grid" id="play-gallery" aria-label="Bildgalleri från föreställningen">
+            <div class="gallery-grid" id="gallery" aria-label="Bildgalleri från föreställningen">
                 <div class="gallery-empty">Laddar bilder</div>
             </div>
         </div>
@@ -196,14 +196,14 @@
 
 <script src="assets/images/gallery/images.js"></script>
 <script>
-const gallery = document.querySelector("#play-gallery");
+const gallery = document.querySelector("#gallery");
 const lightbox = document.querySelector("#gallery-lightbox");
 const lightboxImage = lightbox.querySelector("img");
 const lightboxClose = lightbox.querySelector(".lightbox-close");
 const menuToggle = document.querySelector(".menu-toggle");
 const mobileMenu = document.querySelector("#mobile-menu");
 const imageBasePath = "assets/images/gallery/";
-const playImages = Array.isArray(window.playImages) ? window.playImages : [];
+const galleryImages = Array.isArray(window.galleryImages) ? window.galleryImages : [];
 
 menuToggle.addEventListener("click", () => {
     const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
@@ -220,14 +220,14 @@ mobileMenu.querySelectorAll("a").forEach((link) => {
 
 gallery.replaceChildren();
 
-if (playImages.length === 0) {
+if (galleryImages.length === 0) {
     const emptyState = document.createElement("div");
     emptyState.className = "gallery-empty";
     emptyState.textContent = "Bilder kommer snart";
     gallery.append(emptyState);
 }
 
-playImages.forEach((fileName, index) => {
+galleryImages.forEach((fileName, index) => {
     const button = document.createElement("button");
     const image = document.createElement("img");
     const imagePath = imageBasePath + fileName;

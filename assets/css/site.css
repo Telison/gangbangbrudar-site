@@ -325,7 +325,9 @@ main{
 
 .lightbox{
     width:min(1040px, calc(100% - 28px));
+    height:fit-content;
     max-height:calc(100svh - 28px);
+    overflow:hidden;
     padding:0;
     background:#050505;
     border:1px solid rgba(255, 255, 255, .14);
@@ -338,11 +340,15 @@ main{
 
 .lightbox-inner{
     position:relative;
+    display:grid;
+    place-items:center;
+    max-height:calc(100svh - 30px);
 }
 
 .lightbox img{
     display:block;
     width:100%;
+    height:auto;
     max-height:calc(100svh - 28px);
     object-fit:contain;
 }
