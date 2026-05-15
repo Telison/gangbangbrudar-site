@@ -2,21 +2,22 @@
 
 Static promo site for the theater play **Gangbangbrudar**.
 
-The site is currently a simple coming-soon page and will grow into the public information hub for the production. It will include details about the play, photos, videos, show dates, and a link to where tickets can be bought.
+The site is a mobile-first, static public information page for the production. It is effectively a 1.0 version: the main content, gallery, trailer, show dates, credits, contact details, and site chrome are in place. The remaining production updates are the ticket purchase link and actor portraits.
 
 ## Current Status
 
-- Landing page with the play logo
+- Landing page with the play logo and trailer
+- Sections for the play description, gallery, cast, production credits, show dates, tickets, and contact
 - Custom domain configured through `CNAME`
-- Placeholder copy announcing upcoming September shows
 - Contact section with production email address
 - SVG favicon based on the Vixen Produktion mark
 - Swipe gestures for navigating the mobile gallery lightbox
 
-## Planned Content
+## Remaining Content
 
 - Ticket purchase link
 - Actor portraits
+- Trailer edit: remove or update the outdated play dates at the end of the current trailer.
 
 ## Design Direction
 
