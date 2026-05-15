@@ -225,6 +225,7 @@ let activeGalleryIndex = 0;
 let swipeStartX = 0;
 let swipeStartY = 0;
 let swipePointerId = null;
+let lightboxScrollY = 0;
 const minSwipeDistance = 48;
 
 function showGalleryImage(index) {
@@ -233,6 +234,24 @@ function showGalleryImage(index) {
 
     lightboxImage.src = imagePath;
     lightboxImage.alt = `Bild från Gangbangbrudar ${activeGalleryIndex + 1}`;
+}
+
+function openLightbox() {
+    lightboxScrollY = window.scrollY;
+    document.body.classList.add("lightbox-open");
+    document.body.style.top = `-${lightboxScrollY}px`;
+    lightbox.showModal();
+}
+
+function closeLightbox() {
+    lightbox.close();
+}
+
+function unlockPageScroll() {
+    document.body.classList.remove("lightbox-open");
+    document.body.style.top = "";
+    window.scrollTo(0, lightboxScrollY);
+    swipePointerId = null;
 }
 
 menuToggle.addEventListener("click", () => {
@@ -274,14 +293,14 @@ galleryImages.forEach((fileName, index) => {
     button.append(image);
     button.addEventListener("click", () => {
         showGalleryImage(index);
-        lightbox.showModal();
+        openLightbox();
     });
 
     gallery.append(button);
 });
 
 lightboxClose.addEventListener("click", () => {
-    lightbox.close();
+    closeLightbox();
 });
 
 lightboxPrev.addEventListener("click", () => {
@@ -301,6 +320,12 @@ lightboxImage.addEventListener("pointerdown", (event) => {
     swipeStartY = event.clientY;
     swipePointerId = event.pointerId;
     lightboxImage.setPointerCapture(swipePointerId);
+});
+
+lightboxImage.addEventListener("pointermove", (event) => {
+    if (event.pointerId === swipePointerId) {
+        event.preventDefault();
+    }
 });
 
 lightboxImage.addEventListener("pointerup", (event) => {
@@ -325,9 +350,11 @@ lightboxImage.addEventListener("pointercancel", () => {
 
 lightbox.addEventListener("click", (event) => {
     if (event.target === lightbox) {
-        lightbox.close();
+        closeLightbox();
     }
 });
+
+lightbox.addEventListener("close", unlockPageScroll);
 
 document.addEventListener("keydown", (event) => {
     if (!lightbox.open) {
