@@ -10,6 +10,7 @@ The site is currently a simple coming-soon page and will grow into the public in
 - Custom domain configured through `CNAME`
 - Placeholder copy announcing upcoming September shows
 - Contact section with production email address
+- SVG favicon based on the Vixen Produktion mark
 
 ## Planned Content
 
@@ -18,7 +19,6 @@ The site is currently a simple coming-soon page and will grow into the public in
 
 ## TODO
 
-- Add a favicon / browser tab icon.
 - Can we get swipe gestures to work on mobile to navigate between gallery pictures?
 
 ## Design Direction
@@ -33,6 +33,7 @@ The site should be designed mobile-first, since most visitors are expected to ar
 │   ├── css/
 │   │   └── site.css
 │   ├── images/
+│   │   ├── favicon.svg
 │   │   ├── logo.svg
 │   │   └── gallery/
 │   │       ├── images.js
