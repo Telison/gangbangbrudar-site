@@ -392,7 +392,8 @@ main{
 }
 
 .people-list,
-.dates-list{
+.dates-list,
+.contact-list{
     display:grid;
     gap:1px;
     background:var(--line);
@@ -404,7 +405,8 @@ main{
 }
 
 .person,
-.date-row{
+.date-row,
+.contact-row{
     display:grid;
     gap:5px;
     align-content:start;
@@ -426,13 +428,15 @@ main{
     font-weight:700;
 }
 
-.venue-link{
+.venue-link,
+.contact-link{
     color:inherit;
     text-decoration-color:var(--accent-soft);
     text-underline-offset:4px;
 }
 
-.venue-link:hover{
+.venue-link:hover,
+.contact-link:hover{
     color:var(--accent-soft);
 }
 

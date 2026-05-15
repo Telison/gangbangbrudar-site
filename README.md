@@ -9,15 +9,17 @@ The site is currently a simple coming-soon page and will grow into the public in
 - Landing page with the play logo
 - Custom domain configured through `CNAME`
 - Placeholder copy announcing upcoming September shows
+- Contact section with production email address
 
 ## Planned Content
 
 - Ticket purchase link
-- Information about the play
-- Photos and video material
 - Actor portraits
-- Schedule for upcoming performances
-- Practical venue and show information
+
+## TODO
+
+- Add a favicon / browser tab icon.
+- Can we get swipe gestures to work on mobile to navigate between gallery pictures?
 
 ## Design Direction
 
