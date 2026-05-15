@@ -28,9 +28,11 @@ The site should be designed mobile-first, since most visitors are expected to ar
 ```text
 .
 ├── assets/
+│   ├── css/
+│   │   └── site.css
 │   ├── images/
 │   │   ├── logo.svg
-│   │   └── play/
+│   │   └── gallery/
 │   │       ├── images.js
 │   │       └── ...
 │   └── videos/
@@ -50,7 +52,7 @@ Open `index.html` directly in a browser to preview changes locally.
 
 ## Updating Play Images
 
-The gallery is rendered from `assets/images/play/images.js`. After adding or removing images in `assets/images/play`, regenerate the image manifest:
+The gallery is rendered from `assets/images/gallery/images.js`. After adding or removing images in `assets/images/gallery`, regenerate the image manifest:
 
 ```powershell
 .\scripts\update-play-images.ps1

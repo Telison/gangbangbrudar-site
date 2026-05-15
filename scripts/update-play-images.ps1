@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$imageDir = Join-Path $repoRoot "assets/images/play"
+$imageDir = Join-Path $repoRoot "assets/images/gallery"
 $manifestPath = Join-Path $imageDir "images.js"
 $extensions = @(".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif")
 
