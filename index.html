@@ -6,56 +6,896 @@
 <title>Gangbangbrudar</title>
 
 <style>
+:root{
+    --bg:#080808;
+    --panel:#111111;
+    --panel-soft:#171717;
+    --text:#f4f1ee;
+    --muted:#a8a19b;
+    --line:#2a2725;
+    --accent:#f05a3d;
+    --accent-soft:#ffb199;
+}
+
 *{
     box-sizing:border-box;
 }
 
+html{
+    scroll-behavior:smooth;
+    overflow-x:hidden;
+}
+
 body{
     margin:0;
-    background:#0d0d0d;
-    color:#f2f2f2;
-    font-family:Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Arial, Helvetica, sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+}
+
+img,
+video{
+    max-width:100%;
+}
+
+a{
+    color:inherit;
+}
+
+.site-header{
+    position:sticky;
+    top:0;
+    z-index:10;
+    background:rgba(8, 8, 8, .88);
+    border-bottom:1px solid rgba(255, 255, 255, .08);
+    backdrop-filter:blur(18px);
+}
+
+.nav{
     display:flex;
     align-items:center;
-    justify-content:center;
-    min-height:100vh;
-    min-height:100svh;
-    padding:24px;
-    text-align:center;
-}
-
-.container{
-    max-width:700px;
-    width:100%;
-    padding:clamp(24px, 8vw, 40px);
-}
-
-.logo-heading{
-    margin:0 0 clamp(28px, 6vw, 48px);
-}
-
-.logo{
-    display:block;
-    width:min(100%, 520px);
-    height:auto;
+    justify-content:space-between;
+    gap:16px;
+    width:min(1120px, 100%);
     margin:0 auto;
+    padding:12px 18px;
 }
 
-p{
-    color:#bbbbbb;
-    font-size:clamp(1rem, 4vw, 1.2rem);
-    line-height:1.5;
+.brand{
+    display:block;
+    width:168px;
+    flex:0 0 auto;
+}
+
+.brand img{
+    display:block;
+    width:100%;
+    height:auto;
+}
+
+.nav-links{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:18px;
+    color:var(--muted);
+    font-size:.84rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+
+.nav-links a{
+    text-decoration:none;
+}
+
+.nav-links a:hover{
+    color:var(--text);
+}
+
+.ticket-link{
+    color:var(--bg);
+    background:var(--text);
+    border-radius:999px;
+    padding:9px 13px;
+    font-weight:700;
+}
+
+.ticket-link:hover{
+    color:var(--bg);
+    background:var(--accent-soft);
+}
+
+.menu-toggle{
+    display:none;
+    min-height:40px;
+    padding:8px 12px;
+    background:transparent;
+    border:1px solid var(--line);
+    border-radius:999px;
+    color:var(--text);
+    cursor:pointer;
+    font:inherit;
+    font-size:.82rem;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+.mobile-menu{
+    display:none;
+}
+
+main{
+    overflow:hidden;
+}
+
+.section{
+    border-bottom:1px solid var(--line);
+}
+
+.section-inner{
+    width:100%;
+    max-width:1120px;
+    margin:0 auto;
+    padding:64px 18px;
+}
+
+.hero{
+    min-height:calc(100svh - 68px);
+    display:grid;
+    align-items:center;
+}
+
+.hero-grid{
+    display:grid;
+    gap:34px;
+    min-width:0;
+}
+
+.hero-grid > *{
+    min-width:0;
+}
+
+.hero-logo{
+    display:block;
+    width:min(100%, 560px);
+    height:auto;
+    margin-bottom:28px;
+}
+
+.eyebrow{
+    margin:0 0 12px;
+    color:var(--accent-soft);
+    font-size:.8rem;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+
+.hero .eyebrow{
+    margin-bottom:22px;
+}
+
+.hero-copy{
+    max-width:620px;
+    min-width:0;
+}
+
+.hero-copy h1{
     margin:0;
+}
+
+.hero-copy p{
+    margin:0;
+    color:var(--muted);
+    font-size:1.12rem;
+}
+
+.hero-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:28px;
+}
+
+.button{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    max-width:100%;
+    min-height:44px;
+    padding:11px 16px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    color:var(--text);
+    font-size:.88rem;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-decoration:none;
+    text-align:center;
+    text-transform:uppercase;
+}
+
+.button.primary{
+    border-color:var(--text);
+    background:var(--text);
+    color:var(--bg);
+}
+
+.button:hover{
+    border-color:var(--accent-soft);
+}
+
+.trailer-frame{
+    width:min(420px, 100%);
+    margin:0 auto;
+    background:var(--panel);
+    border:1px solid rgba(255, 255, 255, .1);
+    box-shadow:0 28px 90px rgba(0, 0, 0, .48);
+}
+
+.trailer-frame video{
+    display:block;
+    width:100%;
+    aspect-ratio:9 / 16;
+    object-fit:cover;
+    background:#000;
+}
+
+.section-title{
+    margin:0 0 24px;
+    max-width:760px;
+    font-size:clamp(2rem, 10vw, 4.6rem);
+    line-height:.95;
+    letter-spacing:0;
+}
+
+.about-copy{
+    display:grid;
+    gap:24px;
+    max-width:900px;
+}
+
+.about-copy p{
+    margin:0;
+    color:#d4cfca;
+    font-size:1.05rem;
+}
+
+.script-quote{
+    max-width:820px;
+    color:var(--text);
+    font-size:clamp(1.35rem, 5vw, 2.25rem);
+    font-weight:700;
+    line-height:1.28;
+}
+
+.creator-note{
+    max-width:780px;
+    padding-left:18px;
+    border-left:3px solid var(--accent);
+    color:var(--accent-soft);
+    font-size:1.02rem;
+}
+
+.gallery-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+}
+
+.gallery-item{
+    display:block;
+    min-width:0;
+    padding:0;
+    background:var(--panel-soft);
+    border:1px solid rgba(255, 255, 255, .08);
+    color:inherit;
+    cursor:pointer;
+    overflow:hidden;
+}
+
+.gallery-item img{
+    display:block;
+    width:100%;
+    height:100%;
+    min-height:160px;
+    aspect-ratio:4 / 5;
+    object-fit:cover;
+    filter:saturate(.9) contrast(1.05);
+    transition:transform .22s ease, filter .22s ease;
+}
+
+.gallery-item:hover img{
+    transform:scale(1.035);
+    filter:saturate(1) contrast(1.1);
+}
+
+.gallery-item:first-child{
+    grid-column:span 2;
+    aspect-ratio:16 / 10;
+}
+
+.gallery-empty{
+    display:grid;
+    place-items:center;
+    min-height:180px;
+    background:var(--panel-soft);
+    border:1px solid rgba(255, 255, 255, .08);
+    color:#827a73;
+    font-size:.76rem;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+
+.lightbox{
+    width:min(1040px, calc(100% - 28px));
+    max-height:calc(100svh - 28px);
+    padding:0;
+    background:#050505;
+    border:1px solid rgba(255, 255, 255, .14);
+    color:var(--text);
+}
+
+.lightbox::backdrop{
+    background:rgba(0, 0, 0, .84);
+}
+
+.lightbox-inner{
+    position:relative;
+}
+
+.lightbox img{
+    display:block;
+    width:100%;
+    max-height:calc(100svh - 28px);
+    object-fit:contain;
+}
+
+.lightbox-close{
+    position:absolute;
+    top:10px;
+    right:10px;
+    display:grid;
+    place-items:center;
+    width:40px;
+    height:40px;
+    padding:0;
+    background:rgba(0, 0, 0, .64);
+    border:1px solid rgba(255, 255, 255, .2);
+    border-radius:999px;
+    color:var(--text);
+    cursor:pointer;
+    font-size:1.4rem;
+    line-height:1;
+}
+
+.people-list,
+.dates-list{
+    display:grid;
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+}
+
+.people-list{
+    margin-top:18px;
+}
+
+.person,
+.date-row{
+    display:grid;
+    gap:5px;
+    align-content:start;
+    padding:18px;
+    background:var(--bg);
+}
+
+.label{
+    margin:0;
+    color:var(--muted);
+    font-size:.76rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+
+.value{
+    margin:0;
+    font-size:1.1rem;
+    font-weight:700;
+}
+
+.venue-link{
+    color:inherit;
+    text-decoration-color:var(--accent-soft);
+    text-underline-offset:4px;
+}
+
+.venue-link:hover{
+    color:var(--accent-soft);
+}
+
+.production-credit{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    column-gap:18px;
+}
+
+.production-text{
+    display:grid;
+    gap:5px;
+    min-width:0;
+}
+
+.production-logo-frame{
+    display:block;
+    width:96px;
+    height:122px;
+    margin-top:-12px;
+    overflow:hidden;
+    flex:0 0 auto;
+}
+
+.production-logo{
+    display:block;
+    width:164px;
+    height:auto;
+    max-width:none;
+    transform:translate(-34px, -20px);
+}
+
+.actor-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:12px;
+}
+
+.actor-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+}
+
+.actor-image{
+    display:grid;
+    place-items:center;
+    aspect-ratio:4 / 5;
+    background:
+        linear-gradient(135deg, rgba(255, 255, 255, .08), rgba(240, 90, 61, .18)),
+        var(--panel-soft);
+    color:#827a73;
+    font-size:.76rem;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+
+.actor-info{
+    padding:14px;
+}
+
+.actor-info .value{
+    font-size:1rem;
+}
+
+.tickets{
+    background:var(--text);
+    color:var(--bg);
+}
+
+.tickets .section-inner{
+    padding-block:48px;
+}
+
+.tickets .section-title{
+    color:var(--bg);
+}
+
+.tickets p{
+    max-width:620px;
+    margin:0 0 24px;
+    color:#36312d;
+    font-size:1.05rem;
+}
+
+.tickets .button{
+    border-color:var(--bg);
+    color:var(--bg);
+}
+
+.tickets .button.primary{
+    background:var(--bg);
+    color:var(--text);
+}
+
+@media (max-width:720px){
+    .nav{
+        align-items:center;
+        flex-direction:row;
+        gap:12px;
+        padding:10px 14px;
+    }
+
+    .brand{
+        width:132px;
+        min-width:0;
+    }
+
+    .nav-links{
+        display:none;
+    }
+
+    .menu-toggle{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        flex:0 0 auto;
+        margin-left:auto;
+    }
+
+    .mobile-menu{
+        width:100%;
+        max-width:1120px;
+        margin:0 auto;
+        padding:0 18px 16px;
+    }
+
+    .mobile-menu:not([hidden]){
+        display:grid;
+        gap:8px;
+    }
+
+    .mobile-menu a{
+        display:flex;
+        align-items:center;
+        min-height:48px;
+        padding:12px 0;
+        border-bottom:1px solid var(--line);
+        color:var(--text);
+        font-size:1rem;
+        font-weight:700;
+        text-decoration:none;
+    }
+
+    .mobile-menu .ticket-link{
+        justify-content:center;
+        margin-top:8px;
+        padding:11px 14px;
+        border:0;
+        color:var(--bg);
+    }
+
+    .section-inner{
+        padding:52px 18px;
+    }
+
+    .hero{
+        min-height:auto;
+    }
+
+    .hero-logo{
+        width:100%;
+        margin-bottom:22px;
+    }
+
+    .hero-actions{
+        display:grid;
+        grid-template-columns:1fr;
+    }
+
+    .button{
+        width:100%;
+        padding-inline:12px;
+    }
+
+    .production-credit{
+        column-gap:12px;
+    }
+
+    .production-logo-frame{
+        width:72px;
+        height:92px;
+        margin-top:-8px;
+    }
+
+    .production-logo{
+        width:124px;
+        transform:translate(-26px, -15px);
+    }
+}
+
+@media (min-width:760px){
+    .hero-grid{
+        grid-template-columns:minmax(0, 1.1fr) minmax(300px, .7fr);
+        align-items:center;
+    }
+
+    .gallery-grid{
+        grid-template-columns:repeat(5, minmax(0, 1fr));
+        gap:12px;
+    }
+
+    .gallery-item img{
+        min-height:190px;
+    }
+
+    .gallery-item:first-child{
+        grid-column:span 2;
+        grid-row:span 2;
+        aspect-ratio:auto;
+    }
+
+    .people-list,
+    .dates-list{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+    }
+
+    .production-credit{
+        grid-column:1 / -1;
+    }
+
+    .actor-grid{
+        grid-template-columns:repeat(4, minmax(0, 1fr));
+    }
 }
 </style>
 </head>
 
 <body>
-<div class="container">
-    <h1 class="logo-heading">
-        <img class="logo" src="assets/images/logo.svg" alt="Gangbangbrudar">
-    </h1>
-    <p>Nya föreställningar i september. Mer information kommer snart.</p>
-</div>
+<header class="site-header">
+    <nav class="nav" aria-label="Huvudnavigation">
+        <a class="brand" href="#start" aria-label="Gangbangbrudar startsida">
+            <img src="assets/images/logo.svg" alt="Gangbangbrudar">
+        </a>
+        <div class="nav-links">
+            <a href="#om-pjasen">Om pjäsen</a>
+            <a href="#bilder">Bilder</a>
+            <a href="#medverkande">Medverkande</a>
+            <a href="#speldatum">Speldatum</a>
+            <a class="ticket-link" href="#biljetter">Biljetter</a>
+        </div>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu">Meny</button>
+    </nav>
+    <div class="mobile-menu" id="mobile-menu" hidden>
+        <a href="#om-pjasen">Om pjäsen</a>
+        <a href="#bilder">Bilder</a>
+        <a href="#medverkande">Medverkande</a>
+        <a href="#speldatum">Speldatum</a>
+        <a class="ticket-link" href="#biljetter">Biljetter</a>
+    </div>
+</header>
+
+<main id="start">
+    <section class="section hero" aria-labelledby="hero-title">
+        <div class="section-inner hero-grid">
+            <div class="hero-copy">
+                <p class="eyebrow">Nya föreställningar i september</p>
+                <h1 id="hero-title">
+                    <img class="hero-logo" src="assets/images/logo.svg" alt="Gangbangbrudar">
+                </h1>
+                <p>En svart komedi som gruppaktiviteter. Nya biljetter släpps inom kort.</p>
+                <div class="hero-actions">
+                    <a class="button primary" href="#biljetter">Biljetter kommer snart</a>
+                    <a class="button" href="#bilder">Se bilder</a>
+                </div>
+            </div>
+
+            <div class="trailer-frame" aria-label="Trailer">
+                <video controls playsinline preload="metadata" src="assets/videos/trailer-portrait.mp4"></video>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="om-pjasen" aria-labelledby="about-title">
+        <div class="section-inner">
+            <p class="eyebrow">Om pjäsen</p>
+            <h2 class="section-title" id="about-title">Gangbangbrudar.</h2>
+            <div class="about-copy">
+                <p class="script-quote">”Jag gick upp och satte mig i köket. Började googla. Testosteron. Viagra. Sånt. Drack mer vin och hamnade på Pornhub, som vanligt. Började smårunka, ja. Och sen fick jag plötsligt nog! Mitt i ett ’interracial gangbang’ fick jag bara apnog! Fast det inte ens hade gått för mig. Det var då, tror jag, som jag bestämde mig. Det måste hända något nytt. Nåt radikalt. På måndagen sade jag upp mig.”</p>
+                <p>En grupp män samlas för att tala om sex. De är sammankallade av Magnus, högstadieläraren som vill bli terapeut, och vill sätta ljus på mäns sexualitet. Mötet fylls av bekännelser, skratt, sorg och förbrödring, men också av bittra urladdningar när männens olikheter kommer till ytan och kolliderar. När så Jessica kliver in i rummet rubbas cirklarna och allt ställs obönhörligen på sin spets…</p>
+                <p class="creator-note">Gangbangbrudar är dramatikern Carin Höglunds andra pjäs med tydligt sexuell tematik. Under våren 2025 hade relationsdramat Skarabé sin urpremiär på Teaterverket och blev en publiksuccé. Efterföljaren är nu redo att utmana. Gangbangbrudar – en svart komedi om längtan och om vår oförmåga att mötas.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="bilder" aria-labelledby="gallery-title">
+        <div class="section-inner">
+            <p class="eyebrow">Bilder</p>
+            <h2 class="section-title" id="gallery-title">Galleri.</h2>
+            <div class="gallery-grid" id="play-gallery" aria-label="Bildgalleri från föreställningen">
+                <div class="gallery-empty">Laddar bilder</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="medverkande" aria-labelledby="cast-title">
+        <div class="section-inner">
+            <p class="eyebrow">Medverkande</p>
+            <h2 class="section-title" id="cast-title">På scen och bakom.</h2>
+            <div class="actor-grid" aria-label="Skådespelare med bildplatshållare">
+                <article class="actor-card">
+                    <div class="actor-image">Porträtt</div>
+                    <div class="actor-info">
+                        <p class="label">Skådespelare</p>
+                        <p class="value">Tomas Elison</p>
+                    </div>
+                </article>
+                <article class="actor-card">
+                    <div class="actor-image">Porträtt</div>
+                    <div class="actor-info">
+                        <p class="label">Skådespelare</p>
+                        <p class="value">Markus Karlsson</p>
+                    </div>
+                </article>
+                <article class="actor-card">
+                    <div class="actor-image">Porträtt</div>
+                    <div class="actor-info">
+                        <p class="label">Skådespelare</p>
+                        <p class="value">Suzanne Kennedy</p>
+                    </div>
+                </article>
+                <article class="actor-card">
+                    <div class="actor-image">Porträtt</div>
+                    <div class="actor-info">
+                        <p class="label">Skådespelare</p>
+                        <p class="value">Michael Lechner</p>
+                    </div>
+                </article>
+                <article class="actor-card">
+                    <div class="actor-image">Porträtt</div>
+                    <div class="actor-info">
+                        <p class="label">Skådespelare</p>
+                        <p class="value">Henrik Paninder</p>
+                    </div>
+                </article>
+                <article class="actor-card">
+                    <div class="actor-image">Porträtt</div>
+                    <div class="actor-info">
+                        <p class="label">Skådespelare</p>
+                        <p class="value">Ambjörn Poulsen</p>
+                    </div>
+                </article>
+                <article class="actor-card">
+                    <div class="actor-image">Porträtt</div>
+                    <div class="actor-info">
+                        <p class="label">Skådespelare</p>
+                        <p class="value">Abo Wejdan</p>
+                    </div>
+                </article>
+            </div>
+            <div class="people-list">
+                <div class="person">
+                    <p class="label">Manus och regi</p>
+                    <p class="value">Carin Höglund</p>
+                </div>
+                <div class="person">
+                    <p class="label">Koreografi</p>
+                    <p class="value">Susanna Englund Nygren</p>
+                </div>
+                <div class="person">
+                    <p class="label">Ljuddesign</p>
+                    <p class="value">Anton Elison</p>
+                </div>
+                <div class="person">
+                    <p class="label">Ljusdesign</p>
+                    <p class="value">Ossian Couce Höglund</p>
+                </div>
+                <div class="person production-credit">
+                    <div class="production-text">
+                        <p class="label">Produktion</p>
+                        <p class="value">Vixen Produktion</p>
+                    </div>
+                    <span class="production-logo-frame">
+                        <img class="production-logo" src="assets/images/Vixen-produktion-logo-light.png" alt="Vixen produktion">
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" id="speldatum" aria-labelledby="dates-title">
+        <div class="section-inner">
+            <p class="eyebrow">Speldatum</p>
+            <h2 class="section-title" id="dates-title">Föreställningar i september.</h2>
+            <div class="dates-list">
+                <div class="date-row">
+                    <p class="label">19 september</p>
+                    <p class="value"><a class="venue-link" href="https://o2scenkonst.se/" target="_blank" rel="noopener noreferrer">Ö2 Södermalm</a></p>
+                </div>
+                <div class="date-row">
+                    <p class="label">20 september</p>
+                    <p class="value"><a class="venue-link" href="https://o2scenkonst.se/" target="_blank" rel="noopener noreferrer">Ö2 Södermalm</a></p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tickets" id="biljetter" aria-labelledby="tickets-title">
+        <div class="section-inner">
+            <p class="eyebrow">Biljetter</p>
+            <h2 class="section-title" id="tickets-title">Biljetter släpps snart.</h2>
+            <p>Här länkar vi till biljettköp när försäljningen öppnar.</p>
+            <a class="button primary" href="#start">Till toppen</a>
+        </div>
+    </section>
+</main>
+
+<dialog class="lightbox" id="gallery-lightbox" aria-label="Förhandsvisning av bild">
+    <div class="lightbox-inner">
+        <button class="lightbox-close" type="button" aria-label="Stäng">×</button>
+        <img alt="">
+    </div>
+</dialog>
+
+<script src="assets/images/play/images.js"></script>
+<script>
+const gallery = document.querySelector("#play-gallery");
+const lightbox = document.querySelector("#gallery-lightbox");
+const lightboxImage = lightbox.querySelector("img");
+const lightboxClose = lightbox.querySelector(".lightbox-close");
+const menuToggle = document.querySelector(".menu-toggle");
+const mobileMenu = document.querySelector("#mobile-menu");
+const imageBasePath = "assets/images/play/";
+const playImages = Array.isArray(window.playImages) ? window.playImages : [];
+
+menuToggle.addEventListener("click", () => {
+    const isOpen = menuToggle.getAttribute("aria-expanded") === "true";
+    menuToggle.setAttribute("aria-expanded", String(!isOpen));
+    mobileMenu.hidden = isOpen;
+});
+
+mobileMenu.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+        menuToggle.setAttribute("aria-expanded", "false");
+        mobileMenu.hidden = true;
+    });
+});
+
+gallery.replaceChildren();
+
+if (playImages.length === 0) {
+    const emptyState = document.createElement("div");
+    emptyState.className = "gallery-empty";
+    emptyState.textContent = "Bilder kommer snart";
+    gallery.append(emptyState);
+}
+
+playImages.forEach((fileName, index) => {
+    const button = document.createElement("button");
+    const image = document.createElement("img");
+    const imagePath = imageBasePath + fileName;
+
+    button.className = "gallery-item";
+    button.type = "button";
+    button.setAttribute("aria-label", `Visa bild ${index + 1}`);
+
+    image.src = imagePath;
+    image.alt = `Bild från Gangbangbrudar ${index + 1}`;
+    image.loading = index < 2 ? "eager" : "lazy";
+    image.decoding = "async";
+
+    button.append(image);
+    button.addEventListener("click", () => {
+        lightboxImage.src = imagePath;
+        lightboxImage.alt = image.alt;
+        lightbox.showModal();
+    });
+
+    gallery.append(button);
+});
+
+lightboxClose.addEventListener("click", () => {
+    lightbox.close();
+});
+
+lightbox.addEventListener("click", (event) => {
+    if (event.target === lightbox) {
+        lightbox.close();
+    }
+});
+</script>
 </body>
 </html>

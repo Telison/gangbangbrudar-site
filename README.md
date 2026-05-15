@@ -1,0 +1,63 @@
+# Gangbangbrudar Site
+
+Static promo site for the theater play **Gangbangbrudar**.
+
+The site is currently a simple coming-soon page and will grow into the public information hub for the production. It will include details about the play, photos, videos, show dates, and a link to where tickets can be bought.
+
+## Current Status
+
+- Landing page with the play logo
+- Custom domain configured through `CNAME`
+- Placeholder copy announcing upcoming September shows
+
+## Planned Content
+
+- Ticket purchase link
+- Information about the play
+- Photos and video material
+- Actor portraits
+- Schedule for upcoming performances
+- Practical venue and show information
+
+## Design Direction
+
+The site should be designed mobile-first, since most visitors are expected to arrive from social media links. Key content such as the trailer, show dates, gallery, and ticket link should be easy to reach on small screens.
+
+## Project Structure
+
+```text
+.
+├── assets/
+│   ├── images/
+│   │   ├── logo.svg
+│   │   └── play/
+│   │       ├── images.js
+│   │       └── ...
+│   └── videos/
+│       └── trailer-portrait.mp4
+├── CNAME
+├── index.html
+├── scripts/
+│   └── update-play-images.ps1
+└── README.md
+```
+
+## Development
+
+This is expected to stay a plain static HTML site. There is currently no framework, package manager, or build step.
+
+Open `index.html` directly in a browser to preview changes locally.
+
+## Updating Play Images
+
+The gallery is rendered from `assets/images/play/images.js`. After adding or removing images in `assets/images/play`, regenerate the image manifest:
+
+```powershell
+.\scripts\update-play-images.ps1
+```
+
+The production domain is configured as:
+
+```text
+gangbangbrudar.se
+```
