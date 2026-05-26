@@ -464,19 +464,16 @@ main{
 
 .production-logo-frame{
     display:block;
-    width:96px;
-    height:122px;
+    width:130px;
     margin-top:-12px;
-    overflow:hidden;
     flex:0 0 auto;
 }
 
 .production-logo{
     display:block;
-    width:164px;
+    width:100%;
     height:auto;
-    max-width:none;
-    transform:translate(-34px, -20px);
+    margin-bottom:-10%;
 }
 
 .actor-grid{
@@ -623,14 +620,8 @@ main{
     }
 
     .production-logo-frame{
-        width:72px;
-        height:92px;
+        width:97px;
         margin-top:-8px;
-    }
-
-    .production-logo{
-        width:124px;
-        transform:translate(-26px, -15px);
     }
 }
 
