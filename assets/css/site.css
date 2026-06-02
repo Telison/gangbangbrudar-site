@@ -450,10 +450,22 @@ main{
 }
 
 .production-credit{
+    padding:0;
+}
+
+.production-link{
     display:flex;
     align-items:flex-start;
     justify-content:space-between;
     column-gap:18px;
+    width:100%;
+    padding:18px;
+    color:inherit;
+    text-decoration:none;
+}
+
+.production-link:hover .value{
+    color:var(--accent-soft);
 }
 
 .production-text{
@@ -615,7 +627,7 @@ main{
         padding-inline:12px;
     }
 
-    .production-credit{
+    .production-link{
         column-gap:12px;
     }
 
