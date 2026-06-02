@@ -453,11 +453,28 @@ main{
     padding:0;
 }
 
+.profile-credit,
 .production-link{
     display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    column-gap:18px;
+    align-items:center;
+    gap:16px;
+}
+
+.profile-image{
+    display:block;
+    width:88px;
+    aspect-ratio:4 / 5;
+    object-fit:cover;
+    flex:0 0 auto;
+}
+
+.profile-text{
+    display:grid;
+    gap:5px;
+    min-width:0;
+}
+
+.production-link{
     width:100%;
     padding:18px;
     color:inherit;
@@ -468,24 +485,18 @@ main{
     color:var(--accent-soft);
 }
 
-.production-text{
-    display:grid;
-    gap:5px;
-    min-width:0;
-}
-
 .production-logo-frame{
-    display:block;
-    width:130px;
-    margin-top:-12px;
+    display:grid;
+    place-items:center;
+    overflow:hidden;
     flex:0 0 auto;
 }
 
 .production-logo{
     display:block;
-    width:100%;
+    width:132%;
+    max-width:none;
     height:auto;
-    margin-bottom:-10%;
 }
 
 .actor-grid{
@@ -635,14 +646,6 @@ main{
         padding-inline:12px;
     }
 
-    .production-link{
-        column-gap:12px;
-    }
-
-    .production-logo-frame{
-        width:97px;
-        margin-top:-8px;
-    }
 }
 
 @media (min-width:760px){
@@ -671,7 +674,7 @@ main{
         grid-template-columns:repeat(2, minmax(0, 1fr));
     }
 
-    .production-credit{
+    .photo-credit{
         grid-column:1 / -1;
     }
 
