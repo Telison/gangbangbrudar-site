@@ -288,7 +288,7 @@
 
                 <p><strong>Prickarna på Nortics egen sida</strong> visar samma sak grovt: fem prickar per föreställning, där de färgade är det som återstår och de grå är det som sålts. En ensam färgad prick betyder att 80–99 % redan är sålt, och vid 100 % byts prickarna mot en slutsåld-markering.</p>
 
-                <p>Siffrorna hämtas automatiskt från Nortic ungefär var femte minut.</p>
+                <p>Siffrorna hämtas automatiskt från Nortic ungefär var femte minut och kan nå sidan med några minuters fördröjning. Klockslaget högst upp visar när de senast hämtades, så det är den tidpunkten som gäller — inte just nu.</p>
             </section>
         </div>
     </div>
@@ -385,9 +385,12 @@ async function load() {
     board.classList.add('is-refreshing');
 
     try {
-        // The minute-stamp busts raw.githubusercontent's five minute cache without
-        // minting a brand new URL on every single poll.
-        const response = await fetch(`${DATA_URL}?t=${Math.floor(Date.now() / 60000)}`, { cache: 'no-store' });
+        // raw.githubusercontent leaves the query string out of its cache key, so there is no
+        // busting it from here -- it serves each path for five minutes and no parameter changes
+        // that. With the job running every five minutes the numbers can therefore sit up to ten
+        // minutes behind, which is why the page states the time it last managed to fetch rather
+        // than implying it is live. no-store only keeps the browser from adding a cache of its own.
+        const response = await fetch(DATA_URL, { cache: 'no-store' });
         if (!response.ok) {
             throw new Error(`Hämtningen svarade ${response.status}`);
         }
