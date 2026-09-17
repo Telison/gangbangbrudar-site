@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Biljettläge – Gangbangbrudar</title>
+
+<link rel="icon" href="../assets/images/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../assets/css/site.css">
+<style>
+:root{
+    /* Dim step of --accent for the unfilled part of a meter. 1.68:1 against the panel so it
+       reads as a track, 3.34:1 against the fill so the boundary is never ambiguous. */
+    --meter-track:#5a2f26;
+}
+
+/* The shared header collapses .nav-links into a hamburger below 720px, and this page has
+   no hamburger to collapse into. Two short links fit on a phone, so keep them on show. */
+@media (max-width:720px){
+    .nav-links{
+        display:flex;
+        gap:14px;
+    }
+}
+
+.board{
+    transition:opacity .18s ease;
+}
+
+/* Refetching dims the board in place rather than swapping in a skeleton, so nothing jumps. */
+.board.is-refreshing{
+    opacity:.55;
+}
+
+.status{
+    margin:0 0 28px;
+    color:var(--muted);
+}
+
+.status.is-error{
+    color:var(--accent-soft);
+}
+
+.hero-figure{
+    margin:0 0 36px;
+    padding:26px 22px;
+    border:1px solid var(--line);
+    background:var(--panel);
+}
+
+.hero-value{
+    margin:0;
+    font-size:clamp(3.4rem, 18vw, 5.4rem);
+    font-weight:700;
+    line-height:1;
+    letter-spacing:-.02em;
+}
+
+.hero-label{
+    margin:8px 0 0;
+    color:var(--muted);
+    font-size:1rem;
+}
+
+.meter{
+    height:10px;
+    border-radius:999px;
+    background:var(--meter-track);
+    overflow:hidden;
+}
+
+.meter-fill{
+    height:100%;
+    border-radius:0 4px 4px 0;
+    background:var(--accent);
+    transition:width .3s ease;
+}
+
+.hero-meter{
+    margin-top:20px;
+}
+
+.show-grid{
+    display:grid;
+    gap:18px;
+    margin:0 0 36px;
+}
+
+.show-card{
+    padding:22px;
+    border:1px solid var(--line);
+    background:var(--panel);
+}
+
+.show-when{
+    margin:0 0 4px;
+    font-size:1.25rem;
+    font-weight:700;
+}
+
+.show-share{
+    margin:0 0 16px;
+    color:var(--muted);
+    font-size:.9rem;
+}
+
+.tile-row{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1px;
+    margin-top:18px;
+    background:var(--line);
+    border:1px solid var(--line);
+}
+
+.tile-row.has-capacity{
+    grid-template-columns:repeat(2, 1fr);
+}
+
+.tile{
+    padding:13px 12px;
+    background:var(--panel);
+}
+
+.tile-label{
+    margin:0 0 4px;
+    color:var(--muted);
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+
+.tile-value{
+    margin:0;
+    font-size:1.5rem;
+    font-weight:700;
+    line-height:1.1;
+    /* Tabular only here: these values form vertical columns across the two show cards. */
+    font-variant-numeric:tabular-nums;
+}
+
+.tile.is-remaining .tile-value{
+    color:var(--accent-soft);
+}
+
+.explainer{
+    padding:22px;
+    border:1px solid var(--line);
+    background:var(--panel-soft);
+}
+
+.explainer h2{
+    margin:0 0 12px;
+    font-size:1.15rem;
+}
+
+.explainer p{
+    margin:0 0 12px;
+    max-width:70ch;
+    color:var(--muted);
+    font-size:.95rem;
+}
+
+.explainer ul{
+    margin:0 0 12px;
+    padding-left:20px;
+    max-width:70ch;
+    color:var(--muted);
+    font-size:.95rem;
+}
+
+.explainer li{
+    margin-bottom:7px;
+}
+
+.explainer strong{
+    color:var(--text);
+    font-weight:700;
+}
+
+.explainer :last-child{
+    margin-bottom:0;
+}
+
+.freshness{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:14px;
+    margin:0 0 30px;
+    color:var(--muted);
+    font-size:.88rem;
+}
+
+.freshness.is-stale{
+    color:var(--accent-soft);
+}
+
+.refresh-button{
+    min-width:130px;
+    padding:9px 15px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:none;
+    color:var(--text);
+    font-family:inherit;
+    font-size:.78rem;
+    font-weight:700;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    cursor:pointer;
+}
+
+.refresh-button:hover:not(:disabled){
+    border-color:var(--accent-soft);
+}
+
+.refresh-button:disabled{
+    color:var(--muted);
+    cursor:default;
+}
+
+@media (min-width:720px){
+    .show-grid{
+        grid-template-columns:repeat(2, 1fr);
+    }
+
+    .tile-row.has-capacity{
+        grid-template-columns:repeat(4, 1fr);
+    }
+}
+
+@media (prefers-reduced-motion:reduce){
+    .board,
+    .meter-fill{
+        transition:none;
+    }
+}
+</style>
+</head>
+
+<body>
+<header class="site-header">
+    <nav class="nav" aria-label="Huvudnavigation">
+        <div class="nav-links">
+            <a href="../">Till webbplatsen</a>
+            <a class="ticket-link" href="https://nortic.se/ticket/event/83424" target="_blank" rel="noopener noreferrer">Nortic</a>
+        </div>
+    </nav>
+</header>
+
+<main class="section">
+    <div class="section-inner">
+        <p class="eyebrow">Internt · för produktionen</p>
+        <h1 class="section-title">Biljettläge.</h1>
+
+        <p class="status" id="status" role="status">Hämtar biljettläget…</p>
+
+        <div class="board" id="board" hidden>
+            <div class="freshness" id="freshness">
+                <span id="freshness-text"></span>
+                <button class="refresh-button" id="refresh" type="button">Uppdatera</button>
+            </div>
+
+            <section class="hero-figure" aria-labelledby="hero-label">
+                <p class="hero-value" id="hero-value"></p>
+                <p class="hero-label" id="hero-label"></p>
+                <div class="meter hero-meter" aria-hidden="true">
+                    <div class="meter-fill" id="hero-meter-fill"></div>
+                </div>
+            </section>
+
+            <div class="show-grid" id="shows"></div>
+
+            <section class="explainer" aria-labelledby="explainer-title">
+                <h2 id="explainer-title">Vad siffrorna betyder</h2>
+
+                <p><strong>Släppta platser</strong> är antalet biljetter som ligger ute till försäljning i Nortic för föreställningen. Det är den kvot som är utlagd i systemet — inte med säkerhet antalet stolar i salongen.</p>
+
+                <ul>
+                    <li>Platser som hålls tillbaka för gäster, press eller medverkande och aldrig läggs ut i Nortic ingår <strong>inte</strong> i de släppta platserna. De ligger helt utanför siffrorna på den här sidan.</li>
+                    <li>Platser som läggs ut i Nortic och sedan bokas som fribiljetter räknas som <strong>sålda</strong>, precis som en betald biljett.</li>
+                </ul>
+
+                <p id="capacity-note" hidden></p>
+
+                <p><strong>Prickarna på Nortics egen sida</strong> visar samma sak grovt: fem prickar per föreställning, där de färgade är det som återstår och de grå är det som sålts. En ensam färgad prick betyder att 80–99 % redan är sålt, och vid 100 % byts prickarna mot en slutsåld-markering.</p>
+
+                <p>Siffrorna hämtas automatiskt från Nortic ungefär var femte minut.</p>
+            </section>
+        </div>
+    </div>
+</main>
+
+<script>
+// Salongens verkliga kapacitet per föreställning, om den blir känd. Sätts den till ett tal
+// visar sidan även hur många platser som hålls utanför Nortic. Lämna null så länge siffran
+// är osäker — sidan ska hellre utelämna uppgiften än gissa den.
+const SALONG_KAPACITET = null;
+
+const DATA_URL = 'https://raw.githubusercontent.com/Telison/gangbangbrudar-site/ticket-data/supply.json';
+const REFRESH_MS = 60000;
+const STALE_MINUTES = 20;
+
+const nf = new Intl.NumberFormat('sv-SE');
+const board = document.getElementById('board');
+const statusEl = document.getElementById('status');
+const refreshButton = document.getElementById('refresh');
+
+const share = (sold, released) => (released > 0 ? Math.round((sold / released) * 100) : 0);
+
+// Swedish sets a space before the percent sign, and it has to be non-breaking or the
+// number ends up stranded at the end of one line with the sign at the start of the next.
+const percent = (value) => `${value} %`;
+
+function formatWhen(date, time) {
+    const parsed = new Date(`${date}T${time}:00`);
+    const weekday = parsed.toLocaleDateString('sv-SE', { weekday: 'long' });
+    const day = parsed.toLocaleDateString('sv-SE', { day: 'numeric', month: 'long' });
+    return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)} ${day} · ${time}`;
+}
+
+function tile(label, value, extraClass = '') {
+    return `<div class="tile ${extraClass}"><p class="tile-label">${label}</p><p class="tile-value">${nf.format(value)}</p></div>`;
+}
+
+function renderShow(show) {
+    const sold = share(show.sold, show.released);
+    const held = Number.isFinite(SALONG_KAPACITET) ? SALONG_KAPACITET - show.released : null;
+
+    return `
+        <article class="show-card">
+            <h2 class="show-when">${formatWhen(show.date, show.time)}</h2>
+            <p class="show-share">${percent(sold)} sålt${show.remaining === 0 ? ' — slutsålt' : ''}</p>
+            <div class="meter" aria-hidden="true"><div class="meter-fill" style="width:${sold}%"></div></div>
+            <div class="tile-row${held === null ? '' : ' has-capacity'}">
+                ${tile('Släppta', show.released)}
+                ${tile('Sålda', show.sold)}
+                ${tile('Kvar', show.remaining, 'is-remaining')}
+                ${held === null ? '' : tile('Ej släppta', held)}
+            </div>
+        </article>`;
+}
+
+function renderFreshness(checkedAt) {
+    const minutes = Math.max(0, Math.round((Date.now() - new Date(checkedAt)) / 60000));
+    const clock = new Date(checkedAt).toLocaleTimeString('sv-SE', {
+        hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Stockholm',
+    });
+
+    const stale = minutes >= STALE_MINUTES;
+    document.getElementById('freshness').classList.toggle('is-stale', stale);
+    document.getElementById('freshness-text').textContent = stale
+        ? `Senast hämtat kl. ${clock}, för ${nf.format(minutes)} minuter sedan. Uppdateringen kan ha stannat.`
+        : `Senast hämtat kl. ${clock}.`;
+}
+
+function render(data) {
+    const { totals } = data;
+
+    document.getElementById('hero-value').textContent = nf.format(totals.remaining);
+    document.getElementById('hero-label').textContent =
+        `biljetter kvar av ${nf.format(totals.released)} släppta platser — ${percent(share(totals.sold, totals.released))} sålt`;
+    document.getElementById('hero-meter-fill').style.width = `${share(totals.sold, totals.released)}%`;
+
+    document.getElementById('shows').innerHTML = data.shows.map(renderShow).join('');
+
+    // Only earns a line on the page once someone has actually filled the capacity in.
+    const capacityNote = document.getElementById('capacity-note');
+    capacityNote.hidden = !Number.isFinite(SALONG_KAPACITET);
+    if (!capacityNote.hidden) {
+        capacityNote.textContent =
+            `Salongen är angiven till ${nf.format(SALONG_KAPACITET)} platser per föreställning, så mellanskillnaden visas som ej släppta platser ovan.`;
+    }
+
+    renderFreshness(data.checkedAt);
+    board.hidden = false;
+    statusEl.hidden = true;
+}
+
+async function load() {
+    refreshButton.disabled = true;
+    board.classList.add('is-refreshing');
+
+    try {
+        // The minute-stamp busts raw.githubusercontent's five minute cache without
+        // minting a brand new URL on every single poll.
+        const response = await fetch(`${DATA_URL}?t=${Math.floor(Date.now() / 60000)}`, { cache: 'no-store' });
+        if (!response.ok) {
+            throw new Error(`Hämtningen svarade ${response.status}`);
+        }
+        render(await response.json());
+    } catch (error) {
+        statusEl.hidden = false;
+        statusEl.classList.add('is-error');
+        statusEl.textContent = board.hidden
+            ? 'Det gick inte att hämta biljettläget. Siffrorna uppdateras var femte minut — försök igen om en stund.'
+            : 'Kunde inte uppdatera. Siffrorna nedan är de senast hämtade.';
+        console.error(error);
+    } finally {
+        refreshButton.disabled = false;
+        board.classList.remove('is-refreshing');
+    }
+}
+
+refreshButton.addEventListener('click', load);
+load();
+setInterval(load, REFRESH_MS);
+</script>
+</body>
+</html>
