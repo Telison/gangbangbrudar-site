@@ -288,7 +288,7 @@
 
                 <p><strong>Prickarna på Nortics egen sida</strong> visar samma sak grovt: fem prickar per föreställning, där de färgade är det som återstår och de grå är det som sålts. En ensam färgad prick betyder att 80–99 % redan är sålt, och vid 100 % byts prickarna mot en slutsåld-markering.</p>
 
-                <p>Siffrorna hämtas automatiskt från Nortic ungefär var femte minut och kan nå sidan med några minuters fördröjning. Klockslaget högst upp visar när de senast hämtades, så det är den tidpunkten som gäller — inte just nu.</p>
+                <p>Siffrorna hämtas direkt från Nortic varje gång sidan öppnas och varje gång du trycker på Uppdatera. Svarar inte Nortic visas i stället de senast sparade siffrorna, och raden högst upp säger alltid vilketdera du ser.</p>
             </section>
         </div>
     </div>
@@ -300,8 +300,19 @@
 // är osäker — sidan ska hellre utelämna uppgiften än gissa den.
 const SALONG_KAPACITET = null;
 
-const DATA_URL = 'https://raw.githubusercontent.com/Telison/gangbangbrudar-site/ticket-data/supply.json';
-const REFRESH_MS = 60000;
+// Nortic sends no Access-Control-Allow-Origin, so the browser cannot call it directly. The Worker
+// in proxy/nortic-supply-worker.js forwards that one endpoint with the header added, which is what
+// makes a genuinely live reading possible. Leave this empty and the page quietly uses the snapshot
+// instead -- the numbers are then only as fresh as the last scheduled job.
+const LIVE_URL = 'https://nortic-supply.tomaselison.workers.dev/';
+
+// Written every few minutes by .github/workflows/ticket-supply.yml. Only a fallback now, for when
+// Nortic or the Worker is unreachable.
+const SNAPSHOT_URL = 'https://raw.githubusercontent.com/Telison/gangbangbrudar-site/ticket-data/supply.json';
+
+// Each poll is a live hit on Nortic once the Worker is in place, so this is deliberately slower
+// than it was when every refresh only re-read a cached file. The button covers wanting it sooner.
+const REFRESH_MS = 120000;
 const STALE_MINUTES = 20;
 
 const nf = new Intl.NumberFormat('sv-SE');
@@ -344,20 +355,28 @@ function renderShow(show) {
         </article>`;
 }
 
-function renderFreshness(checkedAt) {
+// A reading straight from Nortic and one dug out of the fallback snapshot are worth very different
+// amounts, so the page says which it is rather than showing a bare timestamp for both.
+// Three genuinely different situations, and conflating any two of them misleads: read straight from
+// Nortic, fell back because Nortic would not answer, or no live source is configured at all.
+function renderFreshness(checkedAt, source) {
     const minutes = Math.max(0, Math.round((Date.now() - new Date(checkedAt)) / 60000));
     const clock = new Date(checkedAt).toLocaleTimeString('sv-SE', {
         hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Stockholm',
     });
+    const age = minutes >= STALE_MINUTES ? `, för ${nf.format(minutes)} minuter sedan` : '';
 
-    const stale = minutes >= STALE_MINUTES;
-    document.getElementById('freshness').classList.toggle('is-stale', stale);
-    document.getElementById('freshness-text').textContent = stale
-        ? `Senast hämtat kl. ${clock}, för ${nf.format(minutes)} minuter sedan. Uppdateringen kan ha stannat.`
-        : `Senast hämtat kl. ${clock}.`;
+    const text = {
+        live: `Hämtat direkt från Nortic kl. ${clock}.`,
+        fallback: `Nortic kunde inte nås. Visar sparade siffror från kl. ${clock}${age}.`,
+        snapshot: `Senast hämtat kl. ${clock}${age}.`,
+    }[source];
+
+    document.getElementById('freshness').classList.toggle('is-stale', source !== 'live' && minutes >= STALE_MINUTES);
+    document.getElementById('freshness-text').textContent = text;
 }
 
-function render(data) {
+function render(data, source) {
     const { totals } = data;
 
     document.getElementById('hero-value').textContent = nf.format(totals.remaining);
@@ -375,9 +394,17 @@ function render(data) {
             `Salongen är angiven till ${nf.format(SALONG_KAPACITET)} platser per föreställning, så mellanskillnaden visas som ej släppta platser ovan.`;
     }
 
-    renderFreshness(data.checkedAt);
+    renderFreshness(data.checkedAt, source);
     board.hidden = false;
     statusEl.hidden = true;
+}
+
+async function fetchJson(url) {
+    const response = await fetch(url, { cache: 'no-store' });
+    if (!response.ok) {
+        throw new Error(`${url} svarade ${response.status}`);
+    }
+    return response.json();
 }
 
 async function load() {
@@ -385,21 +412,28 @@ async function load() {
     board.classList.add('is-refreshing');
 
     try {
-        // raw.githubusercontent leaves the query string out of its cache key, so there is no
-        // busting it from here -- it serves each path for five minutes and no parameter changes
-        // that. With the job running every five minutes the numbers can therefore sit up to ten
-        // minutes behind, which is why the page states the time it last managed to fetch rather
-        // than implying it is live. no-store only keeps the browser from adding a cache of its own.
-        const response = await fetch(DATA_URL, { cache: 'no-store' });
-        if (!response.ok) {
-            throw new Error(`Hämtningen svarade ${response.status}`);
+        let data = null;
+        let source = LIVE_URL ? 'fallback' : 'snapshot';
+
+        if (LIVE_URL) {
+            try {
+                data = await fetchJson(LIVE_URL);
+                source = 'live';
+            } catch (error) {
+                // Falling back is not worth interrupting anyone over -- the freshness line already
+                // says the numbers came from the snapshot, which is the part that matters.
+                console.warn('Live-hämtning misslyckades, faller tillbaka på sparade siffror.', error);
+            }
         }
-        render(await response.json());
+
+        // The snapshot lags, so it is strictly a safety net. Note that its own timestamp is used,
+        // never the time of this request, or a stale reading would look brand new.
+        render(data ?? (await fetchJson(SNAPSHOT_URL)), source);
     } catch (error) {
         statusEl.hidden = false;
         statusEl.classList.add('is-error');
         statusEl.textContent = board.hidden
-            ? 'Det gick inte att hämta biljettläget. Siffrorna uppdateras var femte minut — försök igen om en stund.'
+            ? 'Det gick inte att hämta biljettläget. Försök igen om en stund.'
             : 'Kunde inte uppdatera. Siffrorna nedan är de senast hämtade.';
         console.error(error);
     } finally {
