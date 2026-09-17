@@ -63,7 +63,7 @@ Nortic sends no `Access-Control-Allow-Origin`, so the page cannot call it from t
 
 The fallback is a snapshot on the orphan `ticket-data` branch, written by the workflow and read over `raw.githubusercontent.com`, which unlike Nortic does send CORS headers. The page only touches it when the Worker or Nortic cannot be reached, and says so in the line above the figures rather than passing stale numbers off as live. It lives on an orphan branch for two reasons: it keeps a commit every few minutes out of the site history, and a push made with `GITHUB_TOKEN` does not retrigger `pages-build-deployment`, so a snapshot committed to `main` would never reach the deployed site.
 
-Treat the snapshot as a safety net rather than a second source of truth. GitHub schedules `cron` on a best-effort basis and was observed ignoring a `*/5` schedule entirely for the better part of an hour, so the snapshot can be arbitrarily old. That is survivable precisely because it is only the fallback; `gh workflow run ticket-supply.yml` forces it to refresh if it has drifted badly.
+Treat the snapshot as a safety net rather than a second source of truth. GitHub schedules `cron` on a best-effort basis and drops the tightest schedules first — a `*/15` here is a deliberate retreat from `*/5`, which was ignored outright for over an hour — so the snapshot can still be arbitrarily old. That is survivable precisely because it is only the fallback; `gh workflow run ticket-supply.yml` forces it to refresh if it has drifted badly.
 
 Three things are worth knowing when maintaining it:
 

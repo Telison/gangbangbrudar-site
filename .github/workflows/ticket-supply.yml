@@ -3,16 +3,18 @@ name: Ticket supply
 # Publishes the ticket numbers that biljetter/index.html renders.
 #
 # The snapshot lives on the orphan branch "ticket-data" rather than on main, for two reasons:
-# it keeps the site history free of a commit every five minutes, and a push made with
+# it keeps the site history free of a commit every quarter hour, and a push made with
 # GITHUB_TOKEN does not retrigger pages-build-deployment, so data committed to main would
 # never actually reach the deployed site. The page reads the branch over
 # raw.githubusercontent.com, which unlike Nortic sends Access-Control-Allow-Origin.
 
 on:
   schedule:
-    # Roughly every five minutes. GitHub runs scheduled workflows on a best-effort basis
-    # and skips them under load, so the page always states how old its numbers are.
-    - cron: '*/5 * * * *'
+    # Every fifteen minutes rather than every five. GitHub honours cron on a best-effort basis
+    # and drops the tightest schedules first -- a */5 here was ignored outright for over an hour
+    # -- so asking for less is more likely to actually get something. The page reads Nortic live
+    # anyway, which is why a slower fallback costs nothing.
+    - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:
@@ -39,7 +41,7 @@ jobs:
           path: ticket-data
 
       - name: Fetch the current supply from Nortic
-        # Nortic being briefly unreachable is not worth a failure mail every five minutes.
+        # Nortic being briefly unreachable is not worth a failure mail every quarter hour.
         # A skipped run leaves the snapshot untouched, and the page surfaces that as staleness.
         continue-on-error: true
         run: node scripts/fetch-ticket-supply.mjs ticket-data
