@@ -1,6 +1,6 @@
 {
-  "checkedAt": "2026-09-18T11:53:23.342Z",
-  "changedAt": "2026-09-17T21:41:34.447Z",
+  "checkedAt": "2026-09-18T16:16:52.046Z",
+  "changedAt": "2026-09-18T16:16:52.046Z",
   "eventUrl": "https://nortic.se/ticket/event/83424",
   "shows": [
     {
@@ -8,21 +8,21 @@
       "date": "2026-09-19",
       "time": "19:00",
       "released": 110,
-      "sold": 97,
-      "remaining": 13
+      "sold": 98,
+      "remaining": 12
     },
     {
       "id": 348131,
       "date": "2026-09-20",
       "time": "16:00",
       "released": 110,
-      "sold": 77,
-      "remaining": 33
+      "sold": 79,
+      "remaining": 31
     }
   ],
   "totals": {
     "released": 220,
-    "sold": 174,
-    "remaining": 46
+    "sold": 177,
+    "remaining": 43
   }
 }
