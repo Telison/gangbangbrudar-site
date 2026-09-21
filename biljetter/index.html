@@ -160,6 +160,155 @@ body:not(.mode-frozen) [data-mode="frozen"]{
     color:var(--accent-soft);
 }
 
+.trend{
+    margin:0 0 36px;
+    padding:22px;
+    border:1px solid var(--line);
+    background:var(--panel);
+}
+
+.trend-title{
+    margin:0 0 10px;
+    font-size:1.15rem;
+}
+
+.trend-note{
+    margin:0 0 16px;
+    max-width:70ch;
+    color:var(--muted);
+    font-size:.9rem;
+}
+
+.trend-legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px 18px;
+    margin:0 0 22px;
+    color:var(--muted);
+    font-size:.85rem;
+}
+
+.trend-legend span{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+}
+
+/* A short line-key beside the text: identity comes from the mark, never from colouring
+   the label itself. */
+.trend-legend i{
+    display:inline-block;
+    width:15px;
+    height:2px;
+    border-radius:2px;
+}
+
+.key-sold{
+    background:var(--accent);
+}
+
+.key-released{
+    background:var(--meter-track);
+}
+
+.trend-grid{
+    display:grid;
+    gap:24px;
+}
+
+.trend-card-title{
+    margin:0 0 6px;
+    color:var(--muted);
+    font-size:.72rem;
+    font-weight:700;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+}
+
+.trend-chart{
+    display:block;
+    width:100%;
+    height:auto;
+}
+
+.chart-grid{
+    stroke:var(--line);
+    stroke-width:1;
+}
+
+.chart-released,
+.chart-line{
+    fill:none;
+    stroke-width:2;
+    stroke-linejoin:round;
+    stroke-linecap:round;
+}
+
+.chart-released{
+    stroke:var(--meter-track);
+}
+
+.chart-line{
+    stroke:var(--accent);
+}
+
+/* The 2px ring is the panel colour, so the end dot stays legible where it meets the line. */
+.chart-end{
+    fill:var(--accent);
+    stroke:var(--panel);
+    stroke-width:2;
+}
+
+.chart-axis{
+    fill:var(--muted);
+    font-size:9px;
+}
+
+.chart-endlabel{
+    fill:var(--text);
+    font-size:11px;
+    font-weight:700;
+}
+
+.chart-hit{
+    fill:transparent;
+}
+
+.trend-table{
+    color:var(--muted);
+    font-size:.9rem;
+}
+
+.trend-table summary{
+    cursor:pointer;
+}
+
+.trend-table table{
+    width:100%;
+    margin-top:14px;
+    border-collapse:collapse;
+    font-variant-numeric:tabular-nums;
+}
+
+.trend-table th,
+.trend-table td{
+    padding:7px 10px;
+    border-bottom:1px solid var(--line);
+    text-align:right;
+}
+
+.trend-table th:first-child,
+.trend-table td:first-child{
+    text-align:left;
+}
+
+.trend-table thead th{
+    color:var(--muted);
+    font-size:.7rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
 .explainer{
     padding:22px;
     border:1px solid var(--line);
@@ -238,7 +387,8 @@ body:not(.mode-frozen) [data-mode="frozen"]{
 }
 
 @media (min-width:720px){
-    .show-grid{
+    .show-grid,
+    .trend-grid{
         grid-template-columns:repeat(2, 1fr);
     }
 
@@ -293,6 +443,23 @@ body:not(.mode-frozen) [data-mode="frozen"]{
 
             <div class="show-grid" id="shows"></div>
 
+            <section class="trend" data-mode="frozen" aria-labelledby="trend-title">
+                <h2 class="trend-title" id="trend-title">Försäljningen dag för dag</h2>
+                <p class="trend-note">Kurvan börjar den 17 september, när mätningen sattes igång. Försäljning före det finns inte registrerad, så linjen startar högt — den visar inte starten på biljettsläppet. Släppta platser höjdes från 110 till 115 på morgonen den 19:e, vilket syns som ett steg uppåt.</p>
+
+                <p class="trend-legend">
+                    <span><i class="key-sold"></i>Sålda biljetter</span>
+                    <span><i class="key-released"></i>Släppta platser</span>
+                </p>
+
+                <div class="trend-grid" id="trend-grid"></div>
+
+                <details class="trend-table">
+                    <summary>Visa siffrorna</summary>
+                    <div id="trend-table-body"></div>
+                </details>
+            </section>
+
             <section class="explainer" aria-labelledby="explainer-title">
                 <h2 id="explainer-title">Vad siffrorna betyder</h2>
 
@@ -332,6 +499,32 @@ const SLUTRESULTAT = {
     ],
     totals: { released: 230, sold: 199, remaining: 31 },
 };
+
+// Every reading the snapshot job recorded during the run, as [timestamp, sold, released]. Only
+// the points where a count actually moved were kept, which is why the spacing is uneven. Embedded
+// rather than fetched so the frozen page stays entirely offline.
+const FORSALJNINGSHISTORIK = [
+    {
+        id: 348130,
+        points: [
+            ['2026-09-17T08:03Z', 92, 110], ['2026-09-17T09:57Z', 94, 110], ['2026-09-17T14:19Z', 97, 110],
+            ['2026-09-17T18:29Z', 97, 110], ['2026-09-17T21:41Z', 97, 110], ['2026-09-18T16:16Z', 98, 110],
+            ['2026-09-18T21:43Z', 98, 110], ['2026-09-19T11:37Z', 104, 115], ['2026-09-19T14:50Z', 106, 115],
+            ['2026-09-19T17:54Z', 109, 115], ['2026-09-19T20:29Z', 109, 115], ['2026-09-19T22:27Z', 109, 115],
+            ['2026-09-20T10:02Z', 109, 115], ['2026-09-20T14:15Z', 109, 115],
+        ],
+    },
+    {
+        id: 348131,
+        points: [
+            ['2026-09-17T08:03Z', 72, 110], ['2026-09-17T09:57Z', 73, 110], ['2026-09-17T14:19Z', 73, 110],
+            ['2026-09-17T18:29Z', 76, 110], ['2026-09-17T21:41Z', 77, 110], ['2026-09-18T16:16Z', 79, 110],
+            ['2026-09-18T21:43Z', 81, 110], ['2026-09-19T11:37Z', 82, 115], ['2026-09-19T14:50Z', 82, 115],
+            ['2026-09-19T17:54Z', 82, 115], ['2026-09-19T20:29Z', 83, 115], ['2026-09-19T22:27Z', 82, 115],
+            ['2026-09-20T10:02Z', 87, 115], ['2026-09-20T14:15Z', 90, 115],
+        ],
+    },
+];
 
 // Nortic sends no Access-Control-Allow-Origin, so the browser cannot call it directly. The Worker
 // in proxy/nortic-supply-worker.js forwarded that one endpoint with the header added, which is what
@@ -488,9 +681,89 @@ async function load() {
     }
 }
 
+const inStockholm = (iso, options) =>
+    new Date(iso).toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm', ...options });
+
+// One chart per performance rather than two lines on one. Each is then a single series that can
+// use the accent, which avoids inventing a second hue the site's palette does not have.
+function buildChart(points, titleId) {
+    const W = 320;
+    const H = 150;
+    const pad = { top: 12, right: 40, bottom: 18, left: 26 };
+    const plotW = W - pad.left - pad.right;
+    const plotH = H - pad.top - pad.bottom;
+    const yMax = 120;
+
+    const times = points.map((p) => Date.parse(p[0]));
+    const [t0, t1] = [Math.min(...times), Math.max(...times)];
+    const x = (t) => pad.left + ((t - t0) / (t1 - t0)) * plotW;
+    const y = (v) => pad.top + plotH - (v / yMax) * plotH;
+    const pathOf = (index) =>
+        points.map((p, i) => `${i ? 'L' : 'M'}${x(Date.parse(p[0])).toFixed(1)},${y(p[index]).toFixed(1)}`).join(' ');
+
+    const gridlines = [0, 50, 100]
+        .map((v) => `<line class="chart-grid" x1="${pad.left}" y1="${y(v).toFixed(1)}" x2="${pad.left + plotW}" y2="${y(v).toFixed(1)}"></line>`
+            + `<text class="chart-axis" x="${pad.left - 6}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end">${v}</text>`)
+        .join('');
+
+    // One tick per calendar day, placed at that day's first reading.
+    const seen = new Set();
+    const dayTicks = points
+        .filter((p) => {
+            const day = inStockholm(p[0], { day: 'numeric' });
+            return seen.has(day) ? false : seen.add(day);
+        })
+        .map((p) => `<text class="chart-axis" x="${x(Date.parse(p[0])).toFixed(1)}" y="${H - 5}" text-anchor="middle">${inStockholm(p[0], { day: 'numeric' })}</text>`)
+        .join('');
+
+    const last = points[points.length - 1];
+    const hits = points
+        .map((p) => `<circle class="chart-hit" cx="${x(Date.parse(p[0])).toFixed(1)}" cy="${y(p[1]).toFixed(1)}" r="9">`
+            + `<title>${inStockholm(p[0], { weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })} — ${p[1]} sålda av ${p[2]} släppta</title></circle>`)
+        .join('');
+
+    return `<svg class="trend-chart" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${titleId}">
+        ${gridlines}${dayTicks}
+        <path class="chart-released" d="${pathOf(2)}"></path>
+        <path class="chart-line" d="${pathOf(1)}"></path>
+        <circle class="chart-end" cx="${x(Date.parse(last[0])).toFixed(1)}" cy="${y(last[1]).toFixed(1)}" r="4"></circle>
+        <text class="chart-endlabel" x="${(pad.left + plotW + 9).toFixed(1)}" y="${(y(last[1]) + 4).toFixed(1)}">${last[1]}</text>
+        ${hits}
+    </svg>`;
+}
+
+function renderTrend() {
+    const byId = Object.fromEntries(SLUTRESULTAT.shows.map((show) => [show.id, show]));
+
+    document.getElementById('trend-grid').innerHTML = FORSALJNINGSHISTORIK.map((series) => {
+        const show = byId[series.id];
+        const titleId = `trend-${series.id}`;
+        return `<div>
+            <p class="trend-card-title" id="${titleId}">${formatWhen(show.date, show.time)}</p>
+            ${buildChart(series.points, titleId)}
+        </div>`;
+    }).join('');
+
+    // The chart's job is the shape of the climb; the exact readings live here so no value is
+    // only reachable by hovering.
+    const rows = FORSALJNINGSHISTORIK[0].points
+        .map((point, i) => {
+            const when = inStockholm(point[0], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+            const cells = FORSALJNINGSHISTORIK.map((series) => `<td>${series.points[i][1]}</td>`).join('');
+            return `<tr><td>${when}</td>${cells}<td>${point[2]}</td></tr>`;
+        })
+        .join('');
+
+    document.getElementById('trend-table-body').innerHTML = `<table>
+        <thead><tr><th>Tidpunkt</th><th>Lör 19 sålda</th><th>Sön 20 sålda</th><th>Släppta</th></tr></thead>
+        <tbody>${rows}</tbody>
+    </table>`;
+}
+
 if (document.body.classList.contains('mode-frozen')) {
     // Nothing to fetch, nothing to poll, and no refresh control -- the run is over.
     render(SLUTRESULTAT, 'frozen');
+    renderTrend();
 } else {
     refreshButton.addEventListener('click', load);
     load();

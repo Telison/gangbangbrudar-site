@@ -67,7 +67,9 @@ Open `index.html` directly in a browser to preview changes locally.
 
 ### The September 2026 result
 
-199 of 230 released tickets sold: 109 of 115 on Saturday the 19th, 90 of 115 on Sunday the 20th. The full record, including the sales curve over the four days before opening, is in `data/2026-09-ticket-sales.json`. The frozen figures the page renders are the `SLUTRESULTAT` constant at the top of its script block.
+199 of 230 released tickets sold: 109 of 115 on Saturday the 19th, 90 of 115 on Sunday the 20th. The full record is in `data/2026-09-ticket-sales.json`. The page itself renders two figures from the `SLUTRESULTAT` and `FORSALJNINGSHISTORIK` constants at the top of its script block — the headline result, and a chart per performance showing the climb over the four days before opening. Both are embedded rather than fetched, so the frozen page makes no network request at all.
+
+The charts are one per performance rather than two lines on one, which keeps each to a single series and avoids inventing a second hue the palette does not have. They keep a zero baseline: the run was already about 80 % sold when measuring began, so the slope is genuinely gentle and truncating the axis to dramatise it would misrepresent what happened. Exact readings sit under "Visa siffrorna" so no value is reachable only by hovering.
 
 Two caveats on those numbers, both of which also apply to any future run. They count tickets issued through Nortic only — seats never loaded into Nortic, and anything sold at the door, are invisible here. And the released allocation is a quota somebody sets, not the size of the room: it was raised from 110 to 115 per performance on the morning of the 19th, which is why the total is 230 rather than 220.
 
@@ -75,7 +77,9 @@ Two caveats on those numbers, both of which also apply to any future run. They c
 
 Nortic's supply endpoint, `https://nortic.se/dagny/ajax/event/supply?showIds=...`. Its `remainingPercentage` field counts what has been **sold**, not what remains — Nortic's own code treats 100 as sold out. Both `scripts/fetch-ticket-supply.mjs` and `proxy/nortic-supply-worker.js` derive everything from the two raw counts and never pass that field on.
 
-Nortic sends no `Access-Control-Allow-Origin`, so the page cannot call it from the browser directly. `proxy/nortic-supply-worker.js` is a Cloudflare Worker that forwards that one endpoint with the header added; it is pinned to the show ids in its own source rather than reading them from the query string, so it cannot be used as an open proxy, and it answers with the same JSON shape as the snapshot. The Worker is torn down between runs, so `LIVE_URL` in the page is empty until a new one is deployed.
+Nortic sends no `Access-Control-Allow-Origin`, so the page cannot call it from the browser directly. `proxy/nortic-supply-worker.js` is a Cloudflare Worker that forwards that one endpoint with the header added; it is pinned to the show ids in its own source rather than reading them from the query string, so it cannot be used as an open proxy, and it answers with the same JSON shape as the snapshot. **No Worker is currently deployed** — the September 2026 one was deleted after the run, which is why `LIVE_URL` in the page is empty. Nothing is lost by that: the source here is the whole of it, and step 3 below redeploys it.
+
+Deploying and managing the Worker is done through the Cloudflare dashboard in a browser session. There is deliberately no API token: a token would be a long-lived credential sitting in the account for the sake of a job that happens once a run.
 
 The fallback is a snapshot on the orphan `ticket-data` branch, written by `.github/workflows/ticket-supply.yml` and read over `raw.githubusercontent.com`, which unlike Nortic does send CORS headers. The page only touches it when the Worker or Nortic cannot be reached, and says so above the figures rather than passing stale numbers off as live. It lives on an orphan branch for two reasons: it keeps a commit every few minutes out of the site history, and a push made with `GITHUB_TOKEN` does not retrigger `pages-build-deployment`, so a snapshot committed to `main` would never reach the deployed site.
 
