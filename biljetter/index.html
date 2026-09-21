@@ -760,17 +760,32 @@ function renderTrend() {
     // One shared x scale across both charts, so the two runs are directly comparable and Saturday
     // visibly stops while Sunday carries on.
     const allTimes = trimmed.flatMap((series) => series.points.map((point) => Date.parse(point[0])));
-    const domain = [Math.min(...allTimes), Math.max(...allTimes)];
+    const lastReading = Math.max(...allTimes);
 
-    const seen = new Set();
-    const ticks = trimmed
-        .flatMap((series) => series.points)
-        .map((point) => Date.parse(point[0]))
-        .sort((a, b) => a - b)
-        .flatMap((t) => {
-            const label = inStockholm(t, { day: 'numeric' });
-            return seen.has(label) ? [] : (seen.add(label), [{ t, label }]);
-        });
+    // Ticks sit at midnight, not at whichever reading happened to come first that day. Placing
+    // them on readings made the 18th look half again as long as the 19th, purely because the job
+    // sampled at different times of day. Starting the axis at the first day's midnight puts every
+    // day the same width apart, and the gap before the line starts is honest: nothing was recorded
+    // until mid-morning on the 17th.
+    const asStockholm = (t) =>
+        new Date(`${new Date(t).toLocaleString('sv-SE', { timeZone: 'Europe/Stockholm' }).replace(' ', 'T')}Z`);
+    const midnightBefore = (t) => {
+        const local = asStockholm(t);
+        const offset = local.getTime() - t;
+        local.setUTCHours(0, 0, 0, 0);
+        return local.getTime() - offset;
+    };
+
+    const DAY_MS = 86400000;
+    const domainStart = midnightBefore(Math.min(...allTimes));
+    const domain = [domainStart, lastReading];
+
+    // Even 24h steps are right here because the run is nowhere near a clock change; a run that
+    // straddled one would need midnightBefore called per day instead.
+    const ticks = [];
+    for (let t = domainStart; t <= lastReading; t += DAY_MS) {
+        ticks.push({ t, label: inStockholm(t, { day: 'numeric' }) });
+    }
 
     document.getElementById('trend-grid').innerHTML = trimmed.map((series) => {
         const show = byId[series.id];
