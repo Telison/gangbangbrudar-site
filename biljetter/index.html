@@ -445,7 +445,7 @@ body:not(.mode-frozen) [data-mode="frozen"]{
 
             <section class="trend" data-mode="frozen" aria-labelledby="trend-title">
                 <h2 class="trend-title" id="trend-title">Försäljningen dag för dag</h2>
-                <p class="trend-note">Kurvan börjar den 17 september, när mätningen sattes igång. Försäljning före det finns inte registrerad, så linjen startar högt — den visar inte starten på biljettsläppet. Släppta platser höjdes från 110 till 115 på morgonen den 19:e, vilket syns som ett steg uppåt.</p>
+                <p class="trend-note">Kurvan börjar den 17 september, när mätningen sattes igång. Försäljning före det finns inte registrerad, så linjen startar högt — den visar inte starten på biljettsläppet. Släppta platser höjdes från 110 till 115 på morgonen den 19:e, vilket syns som ett steg uppåt. Varje kurva slutar vid den första avläsningen efter att föreställningen börjat, så lördagens tar slut tidigare än söndagens trots att diagrammen täcker samma dygn.</p>
 
                 <p class="trend-legend">
                     <span><i class="key-sold"></i>Sålda biljetter</span>
@@ -506,6 +506,9 @@ const SLUTRESULTAT = {
 const FORSALJNINGSHISTORIK = [
     {
         id: 348130,
+        // Curtain, in UTC. Stated outright rather than derived from the local date and time, so a
+        // reader in another timezone does not get a different cut-off than the box office had.
+        startsAt: '2026-09-19T17:00Z',
         points: [
             ['2026-09-17T08:03Z', 92, 110], ['2026-09-17T09:57Z', 94, 110], ['2026-09-17T14:19Z', 97, 110],
             ['2026-09-17T18:29Z', 97, 110], ['2026-09-17T21:41Z', 97, 110], ['2026-09-18T16:16Z', 98, 110],
@@ -516,6 +519,7 @@ const FORSALJNINGSHISTORIK = [
     },
     {
         id: 348131,
+        startsAt: '2026-09-20T14:00Z',
         points: [
             ['2026-09-17T08:03Z', 72, 110], ['2026-09-17T09:57Z', 73, 110], ['2026-09-17T14:19Z', 73, 110],
             ['2026-09-17T18:29Z', 76, 110], ['2026-09-17T21:41Z', 77, 110], ['2026-09-18T16:16Z', 79, 110],
@@ -686,7 +690,7 @@ const inStockholm = (iso, options) =>
 
 // One chart per performance rather than two lines on one. Each is then a single series that can
 // use the accent, which avoids inventing a second hue the site's palette does not have.
-function buildChart(points, titleId) {
+function buildChart(points, titleId, [t0, t1], ticks) {
     const W = 320;
     const H = 150;
     const pad = { top: 12, right: 40, bottom: 18, left: 26 };
@@ -694,8 +698,6 @@ function buildChart(points, titleId) {
     const plotH = H - pad.top - pad.bottom;
     const yMax = 120;
 
-    const times = points.map((p) => Date.parse(p[0]));
-    const [t0, t1] = [Math.min(...times), Math.max(...times)];
     const x = (t) => pad.left + ((t - t0) / (t1 - t0)) * plotW;
     const y = (v) => pad.top + plotH - (v / yMax) * plotH;
     const pathOf = (index) =>
@@ -706,14 +708,10 @@ function buildChart(points, titleId) {
             + `<text class="chart-axis" x="${pad.left - 6}" y="${(y(v) + 3).toFixed(1)}" text-anchor="end">${v}</text>`)
         .join('');
 
-    // One tick per calendar day, placed at that day's first reading.
-    const seen = new Set();
-    const dayTicks = points
-        .filter((p) => {
-            const day = inStockholm(p[0], { day: 'numeric' });
-            return seen.has(day) ? false : seen.add(day);
-        })
-        .map((p) => `<text class="chart-axis" x="${x(Date.parse(p[0])).toFixed(1)}" y="${H - 5}" text-anchor="middle">${inStockholm(p[0], { day: 'numeric' })}</text>`)
+    // Ticks come from the shared timeline, not this chart's own points, so both charts carry the
+    // same dates and a line that stops early reads as stopping early rather than as a shorter run.
+    const dayTicks = ticks
+        .map((tick) => `<text class="chart-axis" x="${x(tick.t).toFixed(1)}" y="${H - 5}" text-anchor="middle">${tick.label}</text>`)
         .join('');
 
     const last = points[points.length - 1];
@@ -727,29 +725,55 @@ function buildChart(points, titleId) {
         <path class="chart-released" d="${pathOf(2)}"></path>
         <path class="chart-line" d="${pathOf(1)}"></path>
         <circle class="chart-end" cx="${x(Date.parse(last[0])).toFixed(1)}" cy="${y(last[1]).toFixed(1)}" r="4"></circle>
-        <text class="chart-endlabel" x="${(pad.left + plotW + 9).toFixed(1)}" y="${(y(last[1]) + 4).toFixed(1)}">${last[1]}</text>
+        <text class="chart-endlabel" x="${(x(Date.parse(last[0])) + 9).toFixed(1)}" y="${(y(last[1]) + 4).toFixed(1)}">${last[1]}</text>
         ${hits}
     </svg>`;
 }
 
+// A performance stops selling when it starts, so its curve has no business running on into the
+// next day. The reading at or just after curtain is kept rather than dropped: the final count was
+// not always sampled before the doors opened, and ending on an earlier number would contradict
+// the totals above.
+function untilCurtain(series) {
+    const curtain = Date.parse(series.startsAt);
+    const firstAfter = series.points.findIndex((point) => Date.parse(point[0]) >= curtain);
+    return firstAfter === -1 ? series.points : series.points.slice(0, firstAfter + 1);
+}
+
 function renderTrend() {
     const byId = Object.fromEntries(SLUTRESULTAT.shows.map((show) => [show.id, show]));
+    const trimmed = FORSALJNINGSHISTORIK.map((series) => ({ ...series, points: untilCurtain(series) }));
 
-    document.getElementById('trend-grid').innerHTML = FORSALJNINGSHISTORIK.map((series) => {
+    // One shared x scale across both charts, so the two runs are directly comparable and Saturday
+    // visibly stops while Sunday carries on.
+    const allTimes = trimmed.flatMap((series) => series.points.map((point) => Date.parse(point[0])));
+    const domain = [Math.min(...allTimes), Math.max(...allTimes)];
+
+    const seen = new Set();
+    const ticks = trimmed
+        .flatMap((series) => series.points)
+        .map((point) => Date.parse(point[0]))
+        .sort((a, b) => a - b)
+        .flatMap((t) => {
+            const label = inStockholm(t, { day: 'numeric' });
+            return seen.has(label) ? [] : (seen.add(label), [{ t, label }]);
+        });
+
+    document.getElementById('trend-grid').innerHTML = trimmed.map((series) => {
         const show = byId[series.id];
         const titleId = `trend-${series.id}`;
         return `<div>
             <p class="trend-card-title" id="${titleId}">${formatWhen(show.date, show.time)}</p>
-            ${buildChart(series.points, titleId)}
+            ${buildChart(series.points, titleId, domain, ticks)}
         </div>`;
     }).join('');
 
     // The chart's job is the shape of the climb; the exact readings live here so no value is
-    // only reachable by hovering.
+    // only reachable by hovering. A dash means that performance had already begun.
     const rows = FORSALJNINGSHISTORIK[0].points
         .map((point, i) => {
             const when = inStockholm(point[0], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
-            const cells = FORSALJNINGSHISTORIK.map((series) => `<td>${series.points[i][1]}</td>`).join('');
+            const cells = trimmed.map((series) => `<td>${series.points[i] ? series.points[i][1] : '—'}</td>`).join('');
             return `<tr><td>${when}</td>${cells}<td>${point[2]}</td></tr>`;
         })
         .join('');
