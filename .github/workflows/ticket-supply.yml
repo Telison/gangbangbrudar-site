@@ -9,12 +9,16 @@ name: Ticket supply
 # raw.githubusercontent.com, which unlike Nortic sends Access-Control-Allow-Origin.
 
 on:
-  schedule:
-    # Every fifteen minutes rather than every five. GitHub honours cron on a best-effort basis
-    # and drops the tightest schedules first -- a */5 here was ignored outright for over an hour
-    # -- so asking for less is more likely to actually get something. The page reads Nortic live
-    # anyway, which is why a slower fallback costs nothing.
-    - cron: '*/15 * * * *'
+  # The schedule is commented out between runs rather than deleted, so restarting the polling is
+  # uncommenting three lines. Leave it off while no show is on sale: there is nothing to poll, and
+  # GitHub disables schedules in dormant repositories anyway.
+  #
+  # On how often: GitHub honours cron on a best-effort basis and throttles hard. A */5 produced
+  # nothing at all for the first hour and a half, and the */15 below actually ran about every two
+  # to five hours. Treat whatever you set as an upper bound on frequency, not a promise.
+  #
+  # schedule:
+  #   - cron: '*/15 * * * *'
   workflow_dispatch:
 
 permissions:

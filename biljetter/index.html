@@ -15,6 +15,19 @@
     --meter-track:#5a2f26;
 }
 
+/* The run is over, so the page shows a frozen result. The switch is the class on <body>:
+   drop mode-frozen and it fetches live again. Both wordings stay in the markup rather than
+   one being deleted, so turning it back on never means rewriting the Swedish. */
+.mode-frozen [data-mode="live"],
+body:not(.mode-frozen) [data-mode="frozen"]{
+    display:none;
+}
+
+/* Nothing to refresh when the figures are frozen. */
+.mode-frozen .refresh-button{
+    display:none;
+}
+
 /* The shared header collapses .nav-links into a hamburger below 720px, and this page has
    no hamburger to collapse into. Two short links fit on a phone, so keep them on show. */
 @media (max-width:720px){
@@ -141,7 +154,9 @@
     font-variant-numeric:tabular-nums;
 }
 
-.tile.is-remaining .tile-value{
+/* Marks whichever figure the reader is actually here for -- what is left while tickets are on
+   sale, what went once the run is over. */
+.tile.is-key .tile-value{
     color:var(--accent-soft);
 }
 
@@ -241,7 +256,8 @@
 </style>
 </head>
 
-<body>
+<!-- Remove mode-frozen to put the page back on live figures. See README, "Ticket Status Page". -->
+<body class="mode-frozen">
 <header class="site-header">
     <nav class="nav" aria-label="Huvudnavigation">
         <div class="nav-links">
@@ -253,8 +269,11 @@
 
 <main class="section">
     <div class="section-inner">
-        <p class="eyebrow">Internt · för produktionen</p>
-        <h1 class="section-title">Biljettläge.</h1>
+        <p class="eyebrow" data-mode="live">Internt · för produktionen</p>
+        <p class="eyebrow" data-mode="frozen">Internt · spelperioden 19–20 september 2026</p>
+
+        <h1 class="section-title" data-mode="live">Biljettläge.</h1>
+        <h1 class="section-title" data-mode="frozen">Slutresultat.</h1>
 
         <p class="status" id="status" role="status">Hämtar biljettläget…</p>
 
@@ -288,7 +307,9 @@
 
                 <p><strong>Prickarna på Nortics egen sida</strong> visar samma sak grovt: fem prickar per föreställning, där de färgade är det som återstår och de grå är det som sålts. En ensam färgad prick betyder att 80–99 % redan är sålt, och vid 100 % byts prickarna mot en slutsåld-markering.</p>
 
-                <p>Siffrorna hämtas direkt från Nortic varje gång sidan öppnas och varje gång du trycker på Uppdatera. Svarar inte Nortic visas i stället de senast sparade siffrorna, och raden högst upp säger alltid vilketdera du ser.</p>
+                <p data-mode="live">Siffrorna hämtas direkt från Nortic varje gång sidan öppnas och varje gång du trycker på Uppdatera. Svarar inte Nortic visas i stället de senast sparade siffrorna, och raden högst upp säger alltid vilketdera du ser.</p>
+
+                <p data-mode="frozen">Spelperioden är över och sidan är fryst vid slutsiffrorna. Den hämtar inget från Nortic längre, så siffrorna ovan ändrar sig inte. Kvoten släppta platser höjdes från 110 till 115 per föreställning på morgonen den 19 september, vilket är varför summan är 230 och inte 220.</p>
             </section>
         </div>
     </div>
@@ -300,11 +321,23 @@
 // är osäker — sidan ska hellre utelämna uppgiften än gissa den.
 const SALONG_KAPACITET = null;
 
+// The figures the September 2026 run finished on, as Nortic reported them afterwards. Read only
+// while <body> carries mode-frozen; the full record, including the sales curve over the four days
+// before opening, is kept in data/2026-09-ticket-sales.json.
+const SLUTRESULTAT = {
+    checkedAt: '2026-09-21T05:21:55.521Z',
+    shows: [
+        { id: 348130, date: '2026-09-19', time: '19:00', released: 115, sold: 109, remaining: 6 },
+        { id: 348131, date: '2026-09-20', time: '16:00', released: 115, sold: 90, remaining: 25 },
+    ],
+    totals: { released: 230, sold: 199, remaining: 31 },
+};
+
 // Nortic sends no Access-Control-Allow-Origin, so the browser cannot call it directly. The Worker
-// in proxy/nortic-supply-worker.js forwards that one endpoint with the header added, which is what
-// makes a genuinely live reading possible. Leave this empty and the page quietly uses the snapshot
-// instead -- the numbers are then only as fresh as the last scheduled job.
-const LIVE_URL = 'https://nortic-supply.tomaselison.workers.dev/';
+// in proxy/nortic-supply-worker.js forwarded that one endpoint with the header added, which is what
+// made a genuinely live reading possible. It is torn down between runs, so this is left empty and
+// the page falls back to the snapshot until a new Worker is deployed and its URL pasted back here.
+const LIVE_URL = '';
 
 // Written every quarter hour by .github/workflows/ticket-supply.yml. Only a fallback now, for when
 // Nortic or the Worker is unreachable.
@@ -337,7 +370,7 @@ function tile(label, value, extraClass = '') {
     return `<div class="tile ${extraClass}"><p class="tile-label">${label}</p><p class="tile-value">${nf.format(value)}</p></div>`;
 }
 
-function renderShow(show) {
+function renderShow(show, isFrozen) {
     const sold = share(show.sold, show.released);
     const held = Number.isFinite(SALONG_KAPACITET) ? SALONG_KAPACITET - show.released : null;
 
@@ -348,8 +381,8 @@ function renderShow(show) {
             <div class="meter" aria-hidden="true"><div class="meter-fill" style="width:${sold}%"></div></div>
             <div class="tile-row${held === null ? '' : ' has-capacity'}">
                 ${tile('Släppta', show.released)}
-                ${tile('Sålda', show.sold)}
-                ${tile('Kvar', show.remaining, 'is-remaining')}
+                ${tile('Sålda', show.sold, isFrozen ? 'is-key' : '')}
+                ${tile(isFrozen ? 'Osålda' : 'Kvar', show.remaining, isFrozen ? '' : 'is-key')}
                 ${held === null ? '' : tile('Ej släppta', held)}
             </div>
         </article>`;
@@ -366,25 +399,38 @@ function renderFreshness(checkedAt, source) {
     });
     const age = minutes >= STALE_MINUTES ? `, för ${nf.format(minutes)} minuter sedan` : '';
 
+    const date = new Date(checkedAt).toLocaleDateString('sv-SE', {
+        day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Stockholm',
+    });
+
     const text = {
         live: `Hämtat direkt från Nortic kl. ${clock}.`,
         fallback: `Nortic kunde inte nås. Visar sparade siffror från kl. ${clock}${age}.`,
         snapshot: `Senast hämtat kl. ${clock}${age}.`,
+        frozen: `Slutsiffror, avlästa ${date}.`,
     }[source];
 
-    document.getElementById('freshness').classList.toggle('is-stale', source !== 'live' && minutes >= STALE_MINUTES);
+    // Frozen figures are not stale, they are final, so the warning colour would only mislead.
+    document.getElementById('freshness')
+        .classList.toggle('is-stale', source !== 'live' && source !== 'frozen' && minutes >= STALE_MINUTES);
     document.getElementById('freshness-text').textContent = text;
 }
 
 function render(data, source) {
     const { totals } = data;
 
-    document.getElementById('hero-value').textContent = nf.format(totals.remaining);
-    document.getElementById('hero-label').textContent =
-        `biljetter kvar av ${nf.format(totals.released)} släppta platser — ${percent(share(totals.sold, totals.released))} sålt`;
-    document.getElementById('hero-meter-fill').style.width = `${share(totals.sold, totals.released)}%`;
+    // While tickets are on sale the useful headline is what is still to shift. Once the run is
+    // over nobody is selling anything, so the number that carries meaning is what went.
+    const isFrozen = source === 'frozen';
+    const sold = share(totals.sold, totals.released);
 
-    document.getElementById('shows').innerHTML = data.shows.map(renderShow).join('');
+    document.getElementById('hero-value').textContent = nf.format(isFrozen ? totals.sold : totals.remaining);
+    document.getElementById('hero-label').textContent = isFrozen
+        ? `biljetter sålda av ${nf.format(totals.released)} släppta platser — ${percent(sold)} av kvoten`
+        : `biljetter kvar av ${nf.format(totals.released)} släppta platser — ${percent(sold)} sålt`;
+    document.getElementById('hero-meter-fill').style.width = `${sold}%`;
+
+    document.getElementById('shows').innerHTML = data.shows.map((show) => renderShow(show, isFrozen)).join('');
 
     // Only earns a line on the page once someone has actually filled the capacity in.
     const capacityNote = document.getElementById('capacity-note');
@@ -442,9 +488,14 @@ async function load() {
     }
 }
 
-refreshButton.addEventListener('click', load);
-load();
-setInterval(load, REFRESH_MS);
+if (document.body.classList.contains('mode-frozen')) {
+    // Nothing to fetch, nothing to poll, and no refresh control -- the run is over.
+    render(SLUTRESULTAT, 'frozen');
+} else {
+    refreshButton.addEventListener('click', load);
+    load();
+    setInterval(load, REFRESH_MS);
+}
 </script>
 </body>
 </html>

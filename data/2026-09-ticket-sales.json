@@ -1,0 +1,241 @@
+{
+  "run": "Gangbangbrudar — Ö2scenkonst Södermalm, 19–20 September 2026",
+  "eventUrl": "https://nortic.se/ticket/event/83424",
+  "recordedAt": "2026-09-21T08:30:38.187Z",
+  "note": "Final ticket figures as Nortic reported them after the run. These count tickets issued through Nortic only, including any comps booked through it; seats never loaded into Nortic, and anything sold at the door, are not represented. The released allocation was raised from 110 to 115 per performance on the morning of 19 September.",
+  "shows": [
+    {
+      "id": 348130,
+      "date": "2026-09-19",
+      "time": "19:00",
+      "released": 115,
+      "sold": 109,
+      "remaining": 6
+    },
+    {
+      "id": 348131,
+      "date": "2026-09-20",
+      "time": "16:00",
+      "released": 115,
+      "sold": 90,
+      "remaining": 25
+    }
+  ],
+  "totals": {
+    "released": 230,
+    "sold": 199,
+    "remaining": 31
+  },
+  "history": [
+    {
+      "at": "2026-09-17T08:03:15.097Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 92,
+          "remaining": 18
+        },
+        {
+          "id": 348131,
+          "sold": 72,
+          "remaining": 38
+        }
+      ]
+    },
+    {
+      "at": "2026-09-17T09:57:57.343Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 94,
+          "remaining": 16
+        },
+        {
+          "id": 348131,
+          "sold": 73,
+          "remaining": 37
+        }
+      ]
+    },
+    {
+      "at": "2026-09-17T14:19:22.955Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 97,
+          "remaining": 13
+        },
+        {
+          "id": 348131,
+          "sold": 73,
+          "remaining": 37
+        }
+      ]
+    },
+    {
+      "at": "2026-09-17T18:29:02.783Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 97,
+          "remaining": 13
+        },
+        {
+          "id": 348131,
+          "sold": 76,
+          "remaining": 34
+        }
+      ]
+    },
+    {
+      "at": "2026-09-17T21:41:34.447Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 97,
+          "remaining": 13
+        },
+        {
+          "id": 348131,
+          "sold": 77,
+          "remaining": 33
+        }
+      ]
+    },
+    {
+      "at": "2026-09-18T16:16:52.046Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 98,
+          "remaining": 12
+        },
+        {
+          "id": 348131,
+          "sold": 79,
+          "remaining": 31
+        }
+      ]
+    },
+    {
+      "at": "2026-09-18T21:43:10.143Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 98,
+          "remaining": 12
+        },
+        {
+          "id": 348131,
+          "sold": 81,
+          "remaining": 29
+        }
+      ]
+    },
+    {
+      "at": "2026-09-19T11:37:15.922Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 104,
+          "remaining": 11
+        },
+        {
+          "id": 348131,
+          "sold": 82,
+          "remaining": 33
+        }
+      ]
+    },
+    {
+      "at": "2026-09-19T14:50:04.959Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 106,
+          "remaining": 9
+        },
+        {
+          "id": 348131,
+          "sold": 82,
+          "remaining": 33
+        }
+      ]
+    },
+    {
+      "at": "2026-09-19T17:54:49.010Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 109,
+          "remaining": 6
+        },
+        {
+          "id": 348131,
+          "sold": 82,
+          "remaining": 33
+        }
+      ]
+    },
+    {
+      "at": "2026-09-19T20:29:08.265Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 109,
+          "remaining": 6
+        },
+        {
+          "id": 348131,
+          "sold": 83,
+          "remaining": 32
+        }
+      ]
+    },
+    {
+      "at": "2026-09-19T22:27:41.060Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 109,
+          "remaining": 6
+        },
+        {
+          "id": 348131,
+          "sold": 82,
+          "remaining": 33
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T10:02:03.484Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 109,
+          "remaining": 6
+        },
+        {
+          "id": 348131,
+          "sold": 87,
+          "remaining": 28
+        }
+      ]
+    },
+    {
+      "at": "2026-09-20T14:15:37.355Z",
+      "shows": [
+        {
+          "id": 348130,
+          "sold": 109,
+          "remaining": 6
+        },
+        {
+          "id": 348131,
+          "sold": 90,
+          "remaining": 25
+        }
+      ]
+    }
+  ]
+}
