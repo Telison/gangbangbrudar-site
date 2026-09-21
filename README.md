@@ -2,12 +2,13 @@
 
 Static promo site for the theater play **Gangbangbrudar**.
 
-The site is a mobile-first, static public information page for the production. It is effectively a 1.0 version: the main content, gallery, trailer, show dates, ticket purchase link, actor portraits, credits, contact details, and site chrome are in place.
+The site is a mobile-first, static public information page for the production. The September 2026 run is over, so it now promotes the show as a finished piece rather than selling tickets: main content, gallery, trailer, the dates it played, actor portraits, credits, contact details and site chrome are in place, and the ticket call to action has been replaced by an Instagram follow.
 
 ## Current Status
 
 - Landing page with the play logo and trailer
-- Sections for the play description, gallery, cast, production credits, show dates, tickets, and contact
+- Sections for the play description, gallery, cast, production credits, the dates it played, and contact
+- Instagram follow call to action at `#folj`, linking @gbbrudar_teater with `rel="me"`
 - Custom domain configured through `CNAME`
 - Contact section with production email address
 - SVG favicon based on the Vixen Produktion mark
@@ -16,7 +17,7 @@ The site is a mobile-first, static public information page for the production. I
 
 ## Design Direction
 
-The site should be designed mobile-first, since most visitors are expected to arrive from social media links. Key content such as the trailer, show dates, gallery, and ticket link should be easy to reach on small screens.
+The site should be designed mobile-first, since most visitors are expected to arrive from social media links. Key content such as the trailer, gallery, the dates it played, and the Instagram link should be easy to reach on small screens.
 
 ## Project Structure
 
@@ -94,6 +95,7 @@ Do not rely on the schedule being punctual. GitHub honours `cron` on a best-effo
 5. **Flip the page to live** by removing `mode-frozen` from its `<body>` tag, and update the `data-mode="frozen"` wording if you want the old result kept somewhere.
 6. **Restart the snapshot** by uncommenting the `schedule` block in `.github/workflows/ticket-supply.yml`.
 7. **Check it.** `curl` the Worker directly, then load `/biljetter` and confirm the line above the figures says *Hämtat direkt från Nortic*. If it says anything else, the page is on the fallback and the Worker is not being reached.
+8. **Put the ticket call to action back on the public site.** `index.html` currently sends people to Instagram instead. A new run needs the hero button, the nav pill and the `#folj` callout pointed back at the Nortic event, the hero copy and the `#speldatum` heading returned to future tense, and the new dates listed. The `.callout` section is the inverted block that used to hold the ticket CTA and can hold it again.
 
 Before archiving a finished run, copy its final snapshot and history off the `ticket-data` branch into `data/` as was done for September 2026 — that branch is rewritten by the next run.
 

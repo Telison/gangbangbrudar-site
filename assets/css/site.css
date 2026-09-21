@@ -7,6 +7,9 @@
     --line:#2a2725;
     --accent:#f05a3d;
     --accent-soft:#ffb199;
+    /* Darker step of --accent, for the inverted callout. The soft one is 1.56:1 there and the
+       plain accent 2.99:1; this clears 4.6:1 while staying the same hue. */
+    --accent-deep:#c2401f;
 }
 
 *{
@@ -80,7 +83,10 @@ a{
     color:var(--text);
 }
 
-.ticket-link{
+.follow-link{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
     color:var(--bg);
     background:var(--text);
     border-radius:999px;
@@ -88,9 +94,24 @@ a{
     font-weight:700;
 }
 
-.ticket-link:hover{
+.follow-link:hover{
     color:var(--bg);
     background:var(--accent-soft);
+}
+
+/* Drawn inline rather than loaded as an image, so the mark takes whatever colour its button
+   already has and stays sharp at any size. */
+.icon-instagram{
+    display:block;
+    width:1.05em;
+    height:1.05em;
+    flex:0 0 auto;
+}
+
+.button .icon-instagram{
+    width:1.2em;
+    height:1.2em;
+    margin-right:9px;
 }
 
 .menu-toggle{
@@ -540,32 +561,36 @@ main{
     font-size:1rem;
 }
 
-.tickets{
+.callout{
     background:var(--text);
     color:var(--bg);
 }
 
-.tickets .section-inner{
+.callout .section-inner{
     padding-block:48px;
 }
 
-.tickets .section-title{
+.callout .section-title{
     color:var(--bg);
 }
 
-.tickets p{
+.callout .eyebrow{
+    color:var(--accent-deep);
+}
+
+.callout p{
     max-width:620px;
     margin:0 0 24px;
     color:#36312d;
     font-size:1.05rem;
 }
 
-.tickets .button{
+.callout .button{
     border-color:var(--bg);
     color:var(--bg);
 }
 
-.tickets .button.primary{
+.callout .button.primary{
     background:var(--bg);
     color:var(--text);
 }
@@ -615,7 +640,7 @@ main{
         text-decoration:none;
     }
 
-    .mobile-menu .ticket-link{
+    .mobile-menu .follow-link{
         justify-content:center;
         margin-top:8px;
         padding:11px 14px;
