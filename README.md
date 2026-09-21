@@ -71,7 +71,7 @@ Open `index.html` directly in a browser to preview changes locally.
 
 The charts are one per performance rather than two lines on one, which keeps each to a single series and avoids inventing a second hue the palette does not have. They keep a zero baseline: the run was already about 80 % sold when measuring began, so the slope is genuinely gentle and truncating the axis to dramatise it would misrepresent what happened. Exact readings sit under "Visa siffrorna" so no value is reachable only by hovering.
 
-Two caveats on those numbers, both of which also apply to any future run. They count tickets issued through Nortic only — seats never loaded into Nortic, and anything sold at the door, are invisible here. And the released allocation is a quota somebody sets, not the size of the room: it was raised from 110 to 115 per performance on the morning of the 19th, which is why the total is 230 rather than 220.
+Two caveats on those numbers, both of which also apply to any future run. They count tickets issued through Nortic only — seats never loaded into Nortic, and anything sold at the door, are invisible here. And the released allocation is a quota somebody sets, not the size of the room: it was raised from 110 to 115 per performance, which is why the total is 230 rather than 220. The exact moment is not recorded — the snapshot still read 110 at 21:43 UTC on the 18th and read 115 at 11:37 UTC on the 19th, and nothing was sampled in between. The chart draws that as a step at the later reading rather than a slope, since the quota changed at one instant rather than gradually.
 
 ### Where the numbers come from
 

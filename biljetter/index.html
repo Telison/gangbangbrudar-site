@@ -445,7 +445,7 @@ body:not(.mode-frozen) [data-mode="frozen"]{
 
             <section class="trend" data-mode="frozen" aria-labelledby="trend-title">
                 <h2 class="trend-title" id="trend-title">Försäljningen dag för dag</h2>
-                <p class="trend-note">Kurvan börjar den 17 september, när mätningen sattes igång. Försäljning före det finns inte registrerad, så linjen startar högt — den visar inte starten på biljettsläppet. Släppta platser höjdes från 110 till 115 på morgonen den 19:e, vilket syns som ett steg uppåt. Varje kurva slutar vid den första avläsningen efter att föreställningen börjat, så lördagens tar slut tidigare än söndagens trots att diagrammen täcker samma dygn.</p>
+                <p class="trend-note">Kurvan börjar den 17 september, när mätningen sattes igång. Försäljning före det finns inte registrerad, så linjen startar högt — den visar inte starten på biljettsläppet. Släppta platser höjdes från 110 till 115 per föreställning. Den ändringen ritas som ett hopp, inte en lutning, eftersom kvoten ändrades vid ett tillfälle och inte gradvis. Exakt när vet vi inte: den var 110 vid avläsningen kl. 23:43 den 18:e och 115 vid nästa avläsning kl. 13:37 den 19:e, så hoppet i diagrammet ligger vid den senare tidpunkten. Varje kurva slutar vid den första avläsningen efter att föreställningen börjat, så lördagens tar slut tidigare än söndagens trots att diagrammen täcker samma dygn.</p>
 
                 <p class="trend-legend">
                     <span><i class="key-sold"></i>Sålda biljetter</span>
@@ -476,7 +476,7 @@ body:not(.mode-frozen) [data-mode="frozen"]{
 
                 <p data-mode="live">Siffrorna hämtas direkt från Nortic varje gång sidan öppnas och varje gång du trycker på Uppdatera. Svarar inte Nortic visas i stället de senast sparade siffrorna, och raden högst upp säger alltid vilketdera du ser.</p>
 
-                <p data-mode="frozen">Spelperioden är över och sidan är fryst vid slutsiffrorna. Den hämtar inget från Nortic längre, så siffrorna ovan ändrar sig inte. Kvoten släppta platser höjdes från 110 till 115 per föreställning på morgonen den 19 september, vilket är varför summan är 230 och inte 220.</p>
+                <p data-mode="frozen">Spelperioden är över och sidan är fryst vid slutsiffrorna. Den hämtar inget från Nortic längre, så siffrorna ovan ändrar sig inte. Kvoten släppta platser höjdes från 110 till 115 per föreställning någon gång mellan sena kvällen den 18 september och middagstid den 19:e, vilket är varför summan är 230 och inte 220.</p>
             </section>
         </div>
     </div>
@@ -700,8 +700,21 @@ function buildChart(points, titleId, [t0, t1], ticks) {
 
     const x = (t) => pad.left + ((t - t0) / (t1 - t0)) * plotW;
     const y = (v) => pad.top + plotH - (v / yMax) * plotH;
-    const pathOf = (index) =>
-        points.map((p, i) => `${i ? 'L' : 'M'}${x(Date.parse(p[0])).toFixed(1)},${y(p[index]).toFixed(1)}`).join(' ');
+    // Sold slides between readings, because a hundred separate purchases really are spread across
+    // the gap. The allocation does not: it is one administrative act, so it holds its old value
+    // right up to the reading that caught the change and then jumps. Sloping it would invent a
+    // gradual release that never happened.
+    const pathOf = (index, stepped) =>
+        points
+            .map((point, i) => {
+                const px = x(Date.parse(point[0])).toFixed(1);
+                const py = y(point[index]).toFixed(1);
+                if (i === 0) {
+                    return `M${px},${py}`;
+                }
+                return stepped ? `L${px},${y(points[i - 1][index]).toFixed(1)} L${px},${py}` : `L${px},${py}`;
+            })
+            .join(' ');
 
     const gridlines = [0, 50, 100]
         .map((v) => `<line class="chart-grid" x1="${pad.left}" y1="${y(v).toFixed(1)}" x2="${pad.left + plotW}" y2="${y(v).toFixed(1)}"></line>`
@@ -722,7 +735,7 @@ function buildChart(points, titleId, [t0, t1], ticks) {
 
     return `<svg class="trend-chart" viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="${titleId}">
         ${gridlines}${dayTicks}
-        <path class="chart-released" d="${pathOf(2)}"></path>
+        <path class="chart-released" d="${pathOf(2, true)}"></path>
         <path class="chart-line" d="${pathOf(1)}"></path>
         <circle class="chart-end" cx="${x(Date.parse(last[0])).toFixed(1)}" cy="${y(last[1]).toFixed(1)}" r="4"></circle>
         <text class="chart-endlabel" x="${(x(Date.parse(last[0])) + 9).toFixed(1)}" y="${(y(last[1]) + 4).toFixed(1)}">${last[1]}</text>
